@@ -38,3 +38,13 @@ void printk(const char *formet, ...) {
 void k_print(const char* message){
     default_tty.print(&default_tty,message);
 }
+
+void klogf(bool isok,char* fmt,...){
+    int len;
+    va_list ap;
+    va_start(ap, fmt);
+    char *buf[1024] = {0};
+    len = vsprintf(buf, fmt, ap);
+
+    printk("[%s]: %s",isok ? "  \033[32mOK\033[39m  ":"\033[31mFAILED\033[39m",buf);
+}

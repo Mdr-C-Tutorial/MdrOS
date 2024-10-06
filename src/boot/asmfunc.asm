@@ -1,4 +1,4 @@
-global gdt_flush,tss_flush
+global gdt_flush,tss_flush,idt_flush
 
 gdt_flush: ; void gdt_flush(uint32_t gdtr);
     mov eax, [esp + 4] ; [esp+4]按规定是第一个参数，即gdtr
@@ -14,8 +14,12 @@ gdt_flush: ; void gdt_flush(uint32_t gdtr);
 .flush:
     ret ; 刷新完毕，返回
 
-
 tss_flush:
     mov ax, 0x2B
     ltr ax
+    ret
+
+idt_flush: ; void idt_flush(uint32_t);
+    mov eax, [esp + 4]
+    lidt [eax]
     ret
