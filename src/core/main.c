@@ -1,5 +1,9 @@
 #include "video.h"
 #include "multiboot.h"
+#include "description_table.h"
+#include "io.h"
+#include "tty.h"
+#include "klog.h"
 
 void kernel_main(multiboot_t *mboot){
     vga_install();
@@ -8,7 +12,12 @@ void kernel_main(multiboot_t *mboot){
         vga_writestring((char*)mboot->cmdline);
         vga_writestring("\n");
     }
-    vga_writestring("Hello! MdrOS!\n");
 
-    while(1) asm("hlt");
+    gdt_install();
+
+    tty_init();
+
+    printk("Hello! %s\n","MdrOS");
+
+    while(1) io_hlt();
 }

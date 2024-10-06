@@ -76,11 +76,11 @@ void vga_clear() {
     }
     cursor_x = 0;
     cursor_y = 0;
-    vga_move_cursor();
+    vga_move_cursor(cursor_x,cursor_y);
 }
 
-void vga_move_cursor() {
-    uint16_t cursorLocation = cursor_y * 80 + cursor_x;
+void vga_move_cursor(uint16_t x,uint16_t y) {
+    uint16_t cursorLocation = y * 80 + x;
     outb(0x3D4, 14);
     outb(0x3D5, cursorLocation >> 8);
     outb(0x3D4, 15);
@@ -126,7 +126,7 @@ void vga_putchar(char c) {
     }
 
     scroll();
-    vga_move_cursor();
+    vga_move_cursor(cursor_x,cursor_y);
 }
 
 void vga_write_dec(uint32_t dec) {

@@ -1,4 +1,3 @@
-
 section .multiboot
 
 dd 0x1badb002 ; 文件魔术头, 内核识别码
@@ -17,4 +16,6 @@ _start:
     jmp $
 
 section .bss
+stack_bottom:
+resb 16384
 stack_top:

@@ -1,7 +1,6 @@
-#ifndef CRASHPOWEROS_IO_H
-#define CRASHPOWEROS_IO_H
+#pragma once
 
-#include <stdint.h>
+#include "ctypes.h"
 
 typedef struct {
     unsigned short di, si, bp, sp, bx, dx, cx, ax;
@@ -78,5 +77,3 @@ static inline size_t strlen(const char *str) {
         len++;
     return len;
 }
-
-#endif //CRASHPOWEROS_IO_H

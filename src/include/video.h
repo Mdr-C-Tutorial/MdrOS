@@ -3,7 +3,7 @@
 #include "ctypes.h"
 
 
-void vga_move_cursor();
+void vga_move_cursor(uint16_t x,uint16_t y);
 void vga_clear();
 void vga_putchar(char c);
 void vga_write(const char *data, size_t size);

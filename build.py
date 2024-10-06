@@ -16,6 +16,11 @@ asm_flags = "-f elf32"
 
 build_command = "grub-mkrescue -o mdros.iso iso_img"
 
+def clean():
+    for file in os.listdir("target"):  # 遍历指定文件夹下所有文件
+        os.remove("target/" + file)
+    return 0
+
 def get_files(directory, end):
     file_list = []
     for root, dirs, files in os.walk(directory):
