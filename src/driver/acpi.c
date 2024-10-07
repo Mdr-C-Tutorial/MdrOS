@@ -319,6 +319,10 @@ uint32_t AcpiGetMadtBase() {
     return 0;
 }
 
+void hpet_clock(registers_t *reg){
+    printk("H\n");
+}
+
 void hpet_initialize() {
     HPET *hpet = (HPET *)acpi_find_table("HPET");
     if (!hpet) {
@@ -329,6 +333,14 @@ void hpet_initialize() {
 
     uint32_t counterClockPeriod = hpetInfo->generalCapabilities >> 32;
     hpetPeriod = counterClockPeriod / 1000000;
+
+    HpetTimer hpet_timer = hpetInfo->timers[0];
+    hpet_timer.configurationAndCapability = 0x004c;
+    hpet_timer.comparatorValue = 14318179;
+
+    hpetInfo->mainCounterValue = 0;
+
+    register_interrupt_handler(0x20,hpet_clock);
 
     hpetInfo->generalConfiguration |= 1;  //  启用hpet
 }

@@ -27,6 +27,8 @@ _Noreturn void kernel_main(multiboot_t *multiboot){
 
     page_init(multiboot);
 
+    io_sti();
+
     printk("Hello! [nanoTime: %d] %s\n",nanoTime(),"MdrOS");
 
     while(1) io_hlt();
