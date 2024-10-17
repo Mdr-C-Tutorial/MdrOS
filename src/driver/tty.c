@@ -1,12 +1,18 @@
 #include "tty.h"
 #include "video.h"
 #include "krlibc.h"
+#include "os_terminal.h"
 
 tty_t default_tty;
 
-static void tty_putchar(tty_t *tty_d,int c){
+uint32_t tty_status = 0;
 
-    vga_putchar(c);
+static void tty_putchar(tty_t *tty_d,int c){
+    if(tty_status == TTY_VGA_OUTPUT){
+        vga_putchar(c);
+    } else if(tty_status == TTY_OST_OUTPUT){
+        terminal_advance_state_single(c);
+    }
 }
 
 static void tty_print(tty_t *tty_d,const char* msg){
@@ -27,4 +33,6 @@ void tty_init(void){
     default_tty.print = tty_print;
     default_tty.move_cursor = tty_move_cursor;
     default_tty.putchar = tty_putchar;
+
+    tty_status = TTY_VGA_OUTPUT;
 }

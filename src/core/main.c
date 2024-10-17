@@ -7,6 +7,7 @@
 #include "timer.h"
 #include "acpi.h"
 #include "page.h"
+#include "os_terminal.h"
 
 _Noreturn void kernel_main(multiboot_t *multiboot){
     vga_install();
@@ -18,18 +19,21 @@ _Noreturn void kernel_main(multiboot_t *multiboot){
     idt_install();
     tty_init();
 
-    printk("CP_Kernel-i386_MDROS v0.0.1 (GRUB Multiboot) on an i386\n");
+
     printk("Memory Size: %dMB | ",(multiboot->mem_upper + multiboot->mem_lower) / 1024 + 1);
     printk("Video Resolution: %d x %d\n",multiboot->framebuffer_width,multiboot->framebuffer_height);
 
     init_timer(1);
     acpi_install();
 
+    init_vbe(multiboot);
     page_init(multiboot);
+    terminal_init();
+    extern uint32_t tty_status; tty_status = TTY_OST_OUTPUT;
+
+    printk("CP_Kernel-i386_MDROS v0.0.1 (GRUB Multiboot) on an i386\n");
 
     io_sti();
-
-    printk("Hello! [nanoTime: %d] %s\n",nanoTime(),"MdrOS");
 
     while(1) io_hlt();
 }

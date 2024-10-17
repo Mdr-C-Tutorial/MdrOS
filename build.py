@@ -45,7 +45,7 @@ def ld_obj():
     files = " "
     for file in os.listdir("target"):
         files += "target/"+file+" "
-    str = ld + " -m elf_i386 -nostdlib -T linker.ld" + " -o iso_img/sys/mdkrnl.elf " + files
+    str = ld + " -m elf_i386 -nostdlib -T linker.ld" + " -o iso_img/sys/cpkrnl.elf " + files
     print(str)
     if os.system(str) != 0:
         exit(-1)
@@ -55,10 +55,15 @@ def ld_obj():
 
 compile_c()
 compile_asm()
+
+os.system("cp os_terminal/libcoolpotos_os_terminal.a target/os_terminal.o")
+
 ld_obj()
 
 print("Building iso...")
 if os.system(build_command) != 0:
     exit(-1)
 
-os.system("qemu-system-i386 -cdrom mdros.iso -serial stdio -device sb16 -net nic,model=pcnet -m 4096")
+#os.system("qemu-system-i386 -monitor stdio -cdrom mdros.iso -device sb16 -net nic,model=pcnet -m 4096 -s -S")
+
+os.system("qemu-system-i386 -cdrom mdros.iso -device sb16 -net nic,model=pcnet -m 4096")

@@ -1,5 +1,9 @@
 #pragma once
 
+#define TTY_VGA_OUTPUT 2
+#define TTY_VBE_OUTPUT 4
+#define TTY_OST_OUTPUT 8
+
 #include "ctypes.h"
 
 typedef enum {

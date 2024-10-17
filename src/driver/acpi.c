@@ -24,7 +24,7 @@ acpi_facp_t *facp; // fixed ACPI table
 int acpi_enable_flag;
 uint8_t *rsdp_address;
 
-static HpetInfo *hpetInfo = NULL;
+HpetInfo *hpetInfo = NULL;
 static uint32_t hpetPeriod = 0;
 
 static void AcpiPowerHandler(registers_t *irq) {
@@ -320,7 +320,7 @@ uint32_t AcpiGetMadtBase() {
 }
 
 void hpet_clock(registers_t *reg){
-    printk("H\n");
+
 }
 
 void hpet_initialize() {
