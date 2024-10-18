@@ -28,8 +28,7 @@ _Noreturn void kernel_main(multiboot_t *multiboot){
 
     init_vbe(multiboot);
     page_init(multiboot);
-    terminal_init();
-    extern uint32_t tty_status; tty_status = TTY_OST_OUTPUT;
+    terminal_setup();
 
     printk("CP_Kernel-i386_MDROS v0.0.1 (GRUB Multiboot) on an i386\n");
 

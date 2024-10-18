@@ -56,7 +56,7 @@ def ld_obj():
 compile_c()
 compile_asm()
 
-os.system("cp os_terminal/libcoolpotos_os_terminal.a target/os_terminal.o")
+os.system("cp os_terminal/libos_terminal.a target/os_terminal.o")
 
 ld_obj()
 
@@ -66,4 +66,4 @@ if os.system(build_command) != 0:
 
 #os.system("qemu-system-i386 -monitor stdio -cdrom mdros.iso -device sb16 -net nic,model=pcnet -m 4096 -s -S")
 
-os.system("qemu-system-i386 -cdrom mdros.iso -device sb16 -net nic,model=pcnet -m 4096")
+os.system("qemu-system-i386 -cdrom mdros.iso -serial stdio -device sb16 -net nic,model=pcnet -m 4096")

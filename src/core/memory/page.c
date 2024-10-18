@@ -188,6 +188,14 @@ void page_init(multiboot_t *multiboot){
         alloc_frame_line(get_page(j,1,kernel_directory),j,1,0);
     }
 
+    uint32_t j = multiboot->framebuffer_addr,
+            size = multiboot->framebuffer_height * multiboot->framebuffer_width*multiboot->framebuffer_bpp;
+
+    while (j <= multiboot->framebuffer_addr + size){
+        alloc_frame_line(get_page(j,1,kernel_directory),j,0,1);
+        j += 0x1000;
+    }
+
     register_interrupt_handler(14, page_fault);
     switch_page_directory(kernel_directory);
     open_page();

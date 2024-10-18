@@ -17,7 +17,7 @@ void logkf(char *formet,...){
     va_end(ap);
 }
 
-void logk(char *message){
+void logk(const char *message){
     for (size_t i = 0; i < strlen(message); i++){
 #ifndef OS_HARDWARE_MODE
         write_serial(message[i]);
