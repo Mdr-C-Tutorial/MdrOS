@@ -12,6 +12,7 @@ static void timer_handle(registers_t *regs) {
 }
 
 void clock_sleep(uint32_t timer){
+    io_sti();
     uint32_t sleep = tick + timer;
     while(1){
         int a;

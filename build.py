@@ -11,10 +11,12 @@ asm = "nasm"
 casm = "as"
 ld = "ld"
 
-c_flags = "-w -m32 -nostdlib -ffreestanding -c -Wincompatible-pointer-types -I"+include_dir
+c_flags = "-w -m32 -nostdlib -ffreestanding -c -Wincompatible-pointer-types -Wall -Wextra -I"+include_dir
 asm_flags = "-f elf32"
 
 build_command = "grub-mkrescue -o mdros.iso iso_img"
+
+
 
 def clean():
     for file in os.listdir("target"):  # 遍历指定文件夹下所有文件

@@ -1,7 +1,5 @@
 #include "os_terminal.h"
 
-
-
 void default_putchar(int c){
 
 }

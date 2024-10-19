@@ -56,6 +56,16 @@ uint32_t first_frame() { //获取第一个空闲物理块
     return (uint32_t) - 1;
 }
 
+void free_frame(page_t *page) {
+    uint32_t frame = page->frame;
+    if (!frame) return;
+    else {
+        page->present = 0;
+        clear_frame(frame);
+        page->frame = 0x0;
+    }
+}
+
 void alloc_frame(page_t *page, int is_kernel, int is_writable) {
     if (page->present) {
         return;
