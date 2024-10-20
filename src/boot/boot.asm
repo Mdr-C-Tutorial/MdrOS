@@ -20,6 +20,7 @@ extern kernel_main ; 内核主函数 main.c
 
 _start:
     mov esp,stack_top
+    push esp
     push ebx
     call kernel_main
 L1:

@@ -1,13 +1,14 @@
 #include "timer.h"
 #include "isr.h"
 #include "io.h"
+#include "scheduler.h"
 
 uint32_t tick = 0;
 
 static void timer_handle(registers_t *regs) {
     io_cli();
     tick++;
-    //schedule(regs);
+    scheduler_process(regs);
     io_sti();
 }
 

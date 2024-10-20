@@ -32,4 +32,5 @@ typedef struct page_directory {
     uint32_t physicalAddr;
 }__attribute__((packaged)) page_directory_t;
 
+void switch_page_directory(page_directory_t *dir);
 void page_init(multiboot_t *mboot);

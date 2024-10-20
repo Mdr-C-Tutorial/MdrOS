@@ -1,4 +1,4 @@
-global gdt_flush,tss_flush,idt_flush
+global gdt_flush,tss_flush,idt_flush,switch_to
 
 gdt_flush: ; void gdt_flush(uint32_t gdtr);
     mov eax, [esp + 4] ; [esp+4]按规定是第一个参数，即gdtr
@@ -23,3 +23,34 @@ idt_flush: ; void idt_flush(uint32_t);
     mov eax, [esp + 4]
     lidt [eax]
     ret
+
+switch_to: ;void switch_to(struct context *prev, struct context *next);
+        mov eax, [esp+4]
+
+        mov [eax+0],  esp
+        mov [eax+4],  ebp
+        mov [eax+8],  ebx
+        mov [eax+12], esi
+        mov [eax+16], edi
+        mov [eax+20], ecx
+        mov [eax+24], edx
+
+        pushf        ;保存eflags
+        pop ecx
+        mov [eax+28], ecx
+
+        mov eax, [esp+8]
+
+        mov esp, [eax+0]
+        mov ebp, [eax+4]
+        mov ebx, [eax+8]
+        mov esi, [eax+12]
+        mov edi, [eax+16]
+        mov ecx, [eax+20]
+        mov edx, [eax+24]
+
+        mov eax, [eax+28] ;加载eflags
+        push eax
+        popf
+
+        ret

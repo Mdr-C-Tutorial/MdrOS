@@ -13,13 +13,14 @@
 #include "vfs.h"
 #include "devfs.h"
 #include "os_terminal.h"
+#include "pcb.h"
 
 /*
  * 内核初始化函数, 最终会演变为CPU0的IDLE进程
  * > 注意, 其所有的函数调用顺序均不可改变. 需按顺序初始化OS功能
  * @Noreturn
  */
-_Noreturn void kernel_main(multiboot_t *multiboot){
+_Noreturn void kernel_main(multiboot_t *multiboot,uint32_t kernel_stack){
     vga_install();
 
     if(multiboot->cmdline != (multiboot_uint32_t)NULL){
@@ -45,10 +46,11 @@ _Noreturn void kernel_main(multiboot_t *multiboot){
     ide_init();
     io_cli(); //ide驱动会打开中断以加载硬盘设备, 需重新关闭中断以继续初始化其余OS功能
     devfs_regist();
+
+    init_pcb(kernel_stack);
+
     klogf(true,"Kernel load done!\n");
     io_sti(); //内核加载完毕, 打开中断以启动进程调度器, 开始运行
-
-    print_devfs();
 
     while(1) io_hlt();
 }

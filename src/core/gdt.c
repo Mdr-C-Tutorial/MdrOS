@@ -38,6 +38,10 @@ void gdt_set_gate(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, u
     gdt_entries[num].access       = access;
 }
 
+void set_kernel_stack(uintptr_t stack) {
+    tss.esp0 = stack;
+}
+
 void gdt_install() {
     gdt_ptr.limit = sizeof(gdt_entry_t) * GDT_LENGTH - 1;
     gdt_ptr.base = (uint32_t)&gdt_entries;

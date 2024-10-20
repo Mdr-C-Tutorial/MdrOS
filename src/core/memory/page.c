@@ -177,10 +177,6 @@ void page_init(multiboot_t *multiboot){
     memset(kernel_directory, 0, sizeof(page_directory_t));
     current_directory = kernel_directory;
 
-    for (int index = 0; index < 1024; index++) { //页目录滞空
-        kernel_directory->table_phy[index] = 0x00000002;
-    }
-
     int i = 0;
 
     while (i < (int)program_break_end) {
