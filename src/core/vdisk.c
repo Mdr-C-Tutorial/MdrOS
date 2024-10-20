@@ -23,15 +23,14 @@ int register_vdisk(vdisk vd) {
     for (int i = 0; i < 26; i++) {
         if (!vdisk_ctl[i].flag) {
             vdisk_ctl[i] = vd; // 找到了！
-            return i + ('A');  // 注册成功，返回drive
+            return i;          // 注册成功，返回drive
         }
     }
-    printk("[vdisk]not found\n");
     return 0; // 注册失败
 }
 
-int logout_vdisk(char drive) {
-    int indx = drive - ('A');
+int logout_vdisk(int drive) {
+    int indx = drive;
     if (indx > 26) {
         return 0; // 失败
     }
@@ -43,8 +42,8 @@ int logout_vdisk(char drive) {
     }
 }
 
-int rw_vdisk(char drive, uint32_t lba, uint8_t *buffer,uint32_t number, int read) {
-    int indx = drive - ('A');
+int rw_vdisk(int drive, uint32_t lba, uint8_t *buffer, uint32_t number, int read) {
+    int indx = drive;
     if (indx > 26) {
         return 0; // 失败
     }
@@ -60,8 +59,8 @@ int rw_vdisk(char drive, uint32_t lba, uint8_t *buffer,uint32_t number, int read
     }
 }
 
-bool have_vdisk(char drive) {
-    int indx = drive - 'A';
+bool have_vdisk(int drive) {
+    int indx = drive;
     // printk("drive=%c\n",drive);
     if (indx > 26) {
         return 0; // 失败
@@ -148,7 +147,7 @@ bool CDROM_Read(uint32_t lba, uint32_t number, void *buffer,char drive) {
     return false;
 }
 
-vdisk *get_disk(char drive){
+vdisk *get_disk(int drive){
     uint8_t drive1 = drive;
     if (have_vdisk(drive1)) {
         int indx = drive1 - 'A';
@@ -158,7 +157,7 @@ vdisk *get_disk(char drive){
     }
 }
 
-uint32_t disk_Size(char drive) {
+uint32_t disk_Size(int drive) {
     uint8_t drive1 = drive;
     if (have_vdisk(drive1)) {
         int indx = drive1 - 'A';

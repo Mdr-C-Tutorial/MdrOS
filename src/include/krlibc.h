@@ -19,6 +19,12 @@
 #include "ctypes.h"
 #include <stdarg.h>
 
+typedef struct _xstr {
+    size_t len;
+    size_t hash;
+    char   data[];
+} *xstr;
+
 int vsprintf(char *buf, const char *fmt, va_list args);
 
 void memclean(char *s, int len);
@@ -40,3 +46,27 @@ int isdigit(int c);
 int isalpha(int c);
 int isupper(int c);
 void sleep(uint32_t time);
+
+#define streq(s1, s2)                                                                              \
+  ({                                                                                               \
+    char* _s1 = (s1), _s2 = (s2);                                                                   \
+    (_s1 && _s2) ? strcmp(_s1, _s2) == 0 : _s1 == _s2;                                             \
+  })
+
+#define strneq(s1, s2, n)                                                                          \
+  ({                                                                                               \
+    char* _s1 = (s1), _s2 = (s2);                                                                   \
+    (_s1 && _s2) ? strncmp(_s1, _s2, n) == 0 : _s1 == _s2;                                         \
+  })
+
+#define xstreq(s1, s2)                                                                             \
+  ({                                                                                               \
+    xstr _s1 = (s1), _s2 = (s2);                                                                   \
+    (_s1 && _s2) ? (_s1->hash == _s2->hash ? xstrcmp(_s1, _s2) == 0 : false) : _s1 == _s2;         \
+  })
+
+#define memeq(s1, s2, n)                                                                           \
+  ({                                                                                               \
+    char* _s1 = (s1), _s2 = (s2);                                                                   \
+    (_s1 && _s2) ? memcmp(_s1, _s2, n) == 0 : _s1 == _s2;                                          \
+  })

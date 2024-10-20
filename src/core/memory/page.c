@@ -196,12 +196,11 @@ void page_init(multiboot_t *multiboot){
 
     for (uint32_t j = (uint32_t )hpetInfo; j < ((uint32_t)hpetInfo)+ sizeof(HpetInfo); j+= PAGE_SIZE) {
         alloc_frame_line(get_page(j,1,kernel_directory),j,1,0);
-    }
+    } //acpi Hpet表单独映射
 
     uint32_t j = multiboot->framebuffer_addr,
             size = multiboot->framebuffer_height * multiboot->framebuffer_width*multiboot->framebuffer_bpp;
-
-    while (j <= multiboot->framebuffer_addr + size){
+    while (j <= multiboot->framebuffer_addr + size){ //VBE显存缓冲区映射
         alloc_frame_line(get_page(j,1,kernel_directory),j,0,1);
         j += 0x1000;
     }
