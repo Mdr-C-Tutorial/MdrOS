@@ -8,6 +8,8 @@ fork by `CoolPotOS`
 
 * New Memory Manager
 
+Project struct document [Project docs](docs/README.md)
+
 ## Build
 
 * Download `gcc 12.3.0` and `grub-mkrescue`
