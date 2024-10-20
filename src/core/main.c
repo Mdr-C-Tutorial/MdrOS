@@ -15,6 +15,8 @@
 #include "os_terminal.h"
 #include "pcb.h"
 
+extern void* program_break_end;
+
 /*
  * 内核初始化函数, 最终会演变为CPU0的IDLE进程
  * > 注意, 其所有的函数调用顺序均不可改变. 需按顺序初始化OS功能
@@ -38,6 +40,8 @@ _Noreturn void kernel_main(multiboot_t *multiboot,uint32_t kernel_stack){
     terminal_setup();
 
     printk("CP_Kernel-i386_MDROS v0.0.1 (GRUB Multiboot) on an i386\n");
+    printk("KernelArea: %08x | GraphicsBuffer: %08x \n",program_break_end,multiboot->framebuffer_addr);
+    klogf(true,"Memory manager initialize.\n");
 
     init_vdisk();
     vfs_init();

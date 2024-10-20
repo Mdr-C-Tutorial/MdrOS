@@ -32,5 +32,9 @@ typedef struct page_directory {
     uint32_t physicalAddr;
 }__attribute__((packaged)) page_directory_t;
 
+void alloc_frame_line(page_t *page, uint32_t line,int is_kernel, int is_writable);
+void alloc_frame(page_t *page, int is_kernel, int is_writable);
+void free_frame(page_t *page);
+page_t *get_page(uint32_t address, int make, page_directory_t *dir);
 void switch_page_directory(page_directory_t *dir);
 void page_init(multiboot_t *mboot);

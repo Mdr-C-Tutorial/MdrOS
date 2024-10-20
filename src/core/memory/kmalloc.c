@@ -1,11 +1,40 @@
 #include "kmalloc.h"
+#include "krlibc.h"
+#include "page.h"
+#include "klog.h"
 
-extern uint32_t end;
+extern uint32_t end; //linked.ld
+extern page_directory_t *kernel_directory; //page.c
 void *program_break = &end + 0x1000;
 void *program_break_end;
 
-void *sbrk(int incr) {
-    if (program_break == 0 || program_break + incr >= program_break_end) return (void *) -1;
+void *sbrk(int incr) { //内核堆扩容措施
+    if (program_break == 0) {
+        return (void *) -1;
+    }
+
+    if (program_break + incr >= program_break_end) {
+        ral:
+        if(program_break_end >= (void*)0x01bf8f7d) goto alloc_error; // 奇怪的界限, 不设置内核会卡死
+        if ((uint32_t) program_break_end < USER_AREA_START) {
+            uint32_t ai = (uint32_t) program_break_end;
+            for (; ai < (uint32_t) program_break_end + PAGE_SIZE * 10;) {
+                alloc_frame(get_page(ai, 1, kernel_directory), 1, 0);
+                ai += PAGE_SIZE;
+            }
+            program_break_end = (void *) ai;
+
+            if (program_break + incr >= program_break_end) {
+                goto ral;
+            }
+        } else {
+            alloc_error:
+            klogf(false, "OUT_OF_MEMORY_ERROR: Cannot alloc kernel heap.\n");
+            printk("KernelHeapEnd: %08x\n", program_break_end);
+            while (1) asm("hlt");
+            return (void *) -1;
+        }
+    }
 
     void *prev_break = program_break;
     program_break += incr;
