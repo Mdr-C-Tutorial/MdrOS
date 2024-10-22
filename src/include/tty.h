@@ -5,6 +5,7 @@
 #define TTY_OST_OUTPUT 8
 
 #include "ctypes.h"
+#include "fifo8.h"
 
 typedef enum {
     MODE_A = 'A',
@@ -33,16 +34,10 @@ typedef struct tty_device{
     uint32_t width,height;
     int x, y;
     uint32_t color, back_color;
-
-    /* vt100 */
-    int          vt100;       // 是否检测到标志
-    char         buffer[81];  // 缓冲区
-    int          buf_p;       // 缓冲区指针
-    int          done;        // 这个东西读取完毕没有？
-    vt100_mode_t mode;        // 控制模式
-    int          color_saved; // 保存的颜色
-    uint32_t     vt_status;      // 文本属性
+    struct FIFO8 *fifo;
 }tty_t;
 
+tty_t* default_tty_alloc();
+void free_tty(tty_t *tty);
 void tty_init(void);
 

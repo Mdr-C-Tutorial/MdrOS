@@ -2,6 +2,7 @@
 #include "video.h"
 #include "krlibc.h"
 #include "os_terminal.h"
+#include "kmalloc.h"
 #include "klog.h"
 
 tty_t default_tty;
@@ -26,6 +27,24 @@ static void tty_move_cursor(tty_t *tty_d, int x, int y){
     vga_move_cursor(x,y);
 }
 
+tty_t* default_tty_alloc(){
+    tty_t *tty = (tty_t*)kmalloc(sizeof(tty_t));
+    tty->print = tty_print;
+    tty->move_cursor = tty_move_cursor;
+    tty->putchar = tty_putchar;
+
+    tty->fifo = kmalloc(sizeof(struct FIFO8));
+    char* buf = kmalloc(512);
+    fifo8_init(tty->fifo,512,buf);
+
+    return tty;
+}
+
+void free_tty(tty_t *tty){
+    kfree(tty->fifo);
+    kfree(tty);
+}
+
 void tty_init(void){
     default_tty.color = 0x1;
     default_tty.back_color = 0x0;
@@ -34,6 +53,7 @@ void tty_init(void){
     default_tty.print = tty_print;
     default_tty.move_cursor = tty_move_cursor;
     default_tty.putchar = tty_putchar;
+
 
     tty_status = TTY_VGA_OUTPUT;
 }

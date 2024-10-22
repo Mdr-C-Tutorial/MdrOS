@@ -5,6 +5,7 @@
 #include "krlibc.h"
 #include "kmalloc.h"
 #include "acpi.h"
+#include "scheduler.h"
 
 extern uint32_t end; //linker.ld 内核末尾地址
 
@@ -152,16 +153,19 @@ void page_fault(registers_t *regs) {
         printk("Type: decode address;\n\taddress: %x\n", faulting_address);
     }
 
-    while (1);
-}
+    // 多进程相关, 未实现多进程的OS可将以下代码全部替换为 while(1)
 
-uint32_t get_phy_memsize(multiboot_t *multiboot){
-    uint32_t memsize = (multiboot->mem_upper + multiboot->mem_lower);
-    if (memsize / 1024 + 1 < 3071) {
-        printk("[kernel]: Minimal RAM amount for CP_Kernel is 3071 MB, but you have only %d MB.\n",
-               (multiboot->mem_upper + multiboot->mem_lower) / 1024 + 1);
+    if(get_current_proc()->task_level == TASK_KERNEL_LEVEL){
+        klogf(false,"Kernel Error Panic.\n");
         while (1) io_hlt();
-    } else return memsize * 1024;
+    } else if(get_current_proc()->task_level == TASK_APPLICATION_LEVEL){
+        kill_proc(get_current_proc());
+        while (1) io_hlt();
+    } else if(get_current_proc()->task_level == TASK_SYSTEM_SERVICE_LEVEL){
+        //TODO 蓝屏处理程序待实现
+        klogf(false,"System service error. ==Kernel Panic==\n");
+        while (1) io_hlt();
+    }
 }
 
 void page_init(multiboot_t *multiboot){

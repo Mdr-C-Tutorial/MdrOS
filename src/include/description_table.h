@@ -7,6 +7,34 @@
 
 #define SA_RPL3 3
 
+#define SA_RPL_MASK 0xFFFC
+#define SA_TI_MASK 0xFFFB
+#define GET_SEL(cs, rpl) ((cs & SA_RPL_MASK & SA_TI_MASK) | (rpl))
+
+typedef struct intr_frame_t {
+    unsigned edi;
+    unsigned esi;
+    unsigned ebp;
+    // 虽然 pushad 把 esp 也压入，但 esp 是不断变化的，所以会被 popad 忽略
+    unsigned esp_dummy;
+
+    unsigned ebx;
+    unsigned edx;
+    unsigned ecx;
+    unsigned eax;
+
+    unsigned gs;
+    unsigned fs;
+    unsigned es;
+    unsigned ds;
+
+    unsigned eip;
+    unsigned cs;
+    unsigned eflags;
+    unsigned esp;
+    unsigned ss;
+} intr_frame_t;
+
 typedef struct gdt_entry_t {
     uint16_t limit_low;           // 段基址 | 低16位置
     uint16_t base_low;            // 段基址 | 高16位置

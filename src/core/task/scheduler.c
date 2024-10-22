@@ -19,6 +19,10 @@ void disable_scheduler(){
     can_sche = false;
 }
 
+pcb_t *get_current_proc(){
+    return current_pcb;
+}
+
 void scheduler_process(registers_t *reg){
     io_cli();
     if(current_pcb && can_sche){

@@ -14,15 +14,15 @@
 #include "devfs.h"
 #include "os_terminal.h"
 #include "pcb.h"
+#include "keyboard.h"
 #include "scheduler.h"
 
 extern void* program_break_end;
 
-int test_proc(void *pVoid){
-    printk("Hello! World!\n");
-    return 0;
+int test_proc(){
+    while(1) printk("%c\n",kernel_getch());
+    return -1;
 }
-
 /*
  * 内核初始化函数, 最终会演变为CPU0的IDLE进程
  * > 注意, 其所有的函数调用顺序均不可改变. 需按顺序初始化OS功能
@@ -46,7 +46,9 @@ _Noreturn void kernel_main(multiboot_t *multiboot,uint32_t kernel_stack){
     terminal_setup();
 
     printk("CP_Kernel-i386_MDROS v0.0.1 (GRUB Multiboot) on an i386\n");
-    printk("KernelArea: %08x | GraphicsBuffer: %08x \n",program_break_end,multiboot->framebuffer_addr);
+    printk("KernelArea: 0x00000000 - 0x%08x | GraphicsBuffer: 0x%08x \n",
+           program_break_end,
+           multiboot->framebuffer_addr);
     klogf(true,"Memory manager initialize.\n");
 
     init_vdisk();
@@ -57,9 +59,10 @@ _Noreturn void kernel_main(multiboot_t *multiboot,uint32_t kernel_stack){
     io_cli(); //ide驱动会打开中断以加载硬盘设备, 需重新关闭中断以继续初始化其余OS功能
     devfs_regist();
 
-    init_pcb(kernel_stack);
+    init_pcb();
+    keyboard_init();
 
-    creat_kernel_thread(test_proc,NULL,"TEST_PROC");
+    create_kernel_thread(test_proc,NULL,"Test");
 
     klogf(true,"Kernel load done!\n");
     enable_scheduler();

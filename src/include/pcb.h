@@ -45,6 +45,7 @@ typedef struct task_pcb{
     uint8_t task_level;           // 进程等级< 0:内核 | 1:系统服务 | 2:应用程序 >
     int pid;
     char* name;
+    void* user_stack;             //用户栈
     void* kernel_stack;           //内核栈
     void* program_break;          // 进程堆基址
     void* program_break_end;      // 进程堆尾
@@ -56,7 +57,8 @@ typedef struct task_pcb{
     struct task_pcb *next;     // 链表指针
 }pcb_t;
 
-int creat_kernel_thread(int (*_start)(void* arg),void *args,char* name);
-void kill_proc(pcb_t *pcb);
-pcb_t *found_pcb(int pid);
-void init_pcb(uint32_t kernel_stack);
+int create_user_proc(uint32_t _user_start,char *args,char* name);
+int create_kernel_thread(int (*_start)(void* arg),void *args,char* name);
+void kill_proc(pcb_t *pcb); //杀死指定进程
+pcb_t *found_pcb(int pid); //根据PID获取一个进程
+void init_pcb();
