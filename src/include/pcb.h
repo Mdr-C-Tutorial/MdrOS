@@ -9,6 +9,20 @@
 #include "tty.h"
 #include "vfs.h"
 
+typedef struct __attribute__((packed)) fpu_regs {
+    uint16_t control;
+    uint16_t RESERVED1;
+    uint16_t status;
+    uint16_t RESERVED2;
+    uint16_t tag;
+    uint16_t RESERVED3;
+    uint32_t fip0;
+    uint32_t fop0;
+    uint32_t fdp0;
+    uint32_t fdp1;
+    uint8_t regs[80];
+} fpu_regs_t;
+
 struct context{
     uint32_t esp;
     uint32_t ebp;
@@ -24,6 +38,7 @@ struct context{
     uint32_t ds;
     uint32_t cs;
     uint32_t ss;
+    fpu_regs_t fpu_regs;
 };
 
 typedef struct task_pcb{
@@ -41,4 +56,7 @@ typedef struct task_pcb{
     struct task_pcb *next;     // 链表指针
 }pcb_t;
 
+int creat_kernel_thread(int (*_start)(void* arg),void *args,char* name);
+void kill_proc(pcb_t *pcb);
+pcb_t *found_pcb(int pid);
 void init_pcb(uint32_t kernel_stack);

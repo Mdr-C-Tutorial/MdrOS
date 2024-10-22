@@ -70,10 +70,3 @@ static inline uint8_t inb(uint16_t port) {
 static inline void insw(uint16_t port, void *addr, uint32_t word_cnt) {
     asm volatile("cld; rep insw" : "+D"(addr), "+c"(word_cnt) : "d"(port) : "memory");
 }
-
-static inline size_t strlen(const char *str) {
-    size_t len = 0;
-    while (str[len])
-        len++;
-    return len;
-}

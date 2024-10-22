@@ -14,8 +14,14 @@
 #include "devfs.h"
 #include "os_terminal.h"
 #include "pcb.h"
+#include "scheduler.h"
 
 extern void* program_break_end;
+
+int test_proc(void *pVoid){
+    printk("Hello! World!\n");
+    return 0;
+}
 
 /*
  * 内核初始化函数, 最终会演变为CPU0的IDLE进程
@@ -53,7 +59,10 @@ _Noreturn void kernel_main(multiboot_t *multiboot,uint32_t kernel_stack){
 
     init_pcb(kernel_stack);
 
+    creat_kernel_thread(test_proc,NULL,"TEST_PROC");
+
     klogf(true,"Kernel load done!\n");
+    enable_scheduler();
     io_sti(); //内核加载完毕, 打开中断以启动进程调度器, 开始运行
 
     while(1) io_hlt();

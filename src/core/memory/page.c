@@ -175,7 +175,6 @@ void page_init(multiboot_t *multiboot){
 
     kernel_directory = (page_directory_t *) kmalloc(sizeof(page_directory_t));
     memset(kernel_directory, 0, sizeof(page_directory_t));
-    current_directory = kernel_directory;
 
     int i = 0;
 

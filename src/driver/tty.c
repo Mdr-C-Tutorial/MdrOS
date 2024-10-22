@@ -13,7 +13,6 @@ static void tty_putchar(tty_t *tty_d,int c){
         vga_putchar(c);
     } else if(tty_status == TTY_OST_OUTPUT){
         terminal_advance_state_single(c);
-        logkf("%c",c);
     }
 }
 
