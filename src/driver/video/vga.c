@@ -1,5 +1,6 @@
 #include "video.h"
 #include "io.h"
+#include "krlibc.h"
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25

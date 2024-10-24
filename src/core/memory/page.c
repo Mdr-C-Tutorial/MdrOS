@@ -75,7 +75,7 @@ void alloc_frame(page_t *page, int is_kernel, int is_writable) {
         uint32_t idx = first_frame();
         if (idx == (uint32_t) - 1) {
             printk("FRAMES_FREE_ERROR: Cannot free frames!\n");
-            asm("cli");
+            __asm__("cli");
             for (;;)io_hlt();
         }
 
@@ -119,20 +119,20 @@ page_t *get_page(uint32_t address, int make, page_directory_t *dir) {
 
 static void open_page(){ //打开分页机制
     uint32_t cr0;
-    asm volatile("mov %%cr0, %0" : "=b"(cr0));
+    __asm__ volatile("mov %%cr0, %0" : "=b"(cr0));
     cr0 |= 0x80000000;
-    asm volatile("mov %0, %%cr0" : : "b"(cr0));
+    __asm__ volatile("mov %0, %%cr0" : : "b"(cr0));
 }
 
 void switch_page_directory(page_directory_t *dir){
     current_directory = dir;
-    asm volatile("mov %0, %%cr3" : : "r"(&dir->table_phy));
+    __asm__ volatile("mov %0, %%cr3" : : "r"(&dir->table_phy));
 }
 
 void page_fault(registers_t *regs) {
     io_cli();
     uint32_t faulting_address;
-    asm volatile("mov %%cr2, %0" : "=r" (faulting_address)); //
+    __asm__ volatile("mov %%cr2, %0" : "=r" (faulting_address)); //
 
     int present = !(regs->err_code & 0x1); // 页不存在
     int rw = regs->err_code & 0x2; // 只读页被写入

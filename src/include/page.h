@@ -20,17 +20,17 @@ typedef struct page{
     uint8_t global: 1;
     uint8_t ignored: 3;
     uint32_t frame: 20;
-}__attribute__((packaged)) page_t;
+}__attribute__((packed)) page_t;
 
 typedef struct page_table {
     page_t pages[1024];
-}__attribute__((packaged)) page_table_t;
+}__attribute__((packed)) page_table_t;
 
 typedef struct page_directory {
     page_table_t volatile*tables[1024];
     uint32_t table_phy[1024];
     uint32_t physicalAddr;
-}__attribute__((packaged)) page_directory_t;
+}__attribute__((packed)) page_directory_t;
 
 void alloc_frame_line(page_t *page, uint32_t line,int is_kernel, int is_writable);
 void alloc_frame(page_t *page, int is_kernel, int is_writable);

@@ -35,7 +35,7 @@ unsigned static char atapi_packet[12] = {0xA8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static int package[2];
 
 static inline void insl(uint32_t port, uint32_t *addr, int cnt) {
-    asm volatile("cld;"
+    __asm__ volatile("cld;"
                  "repne; insl;"
             : "=D"(addr), "=c"(cnt)
             : "d"(port), "0"(addr), "1"(cnt)
@@ -223,7 +223,7 @@ void ide_read_buffer(unsigned char channel, unsigned char reg,
      */
     if (reg > 0x07 && reg < 0x0C)
         ide_write(channel, ATA_REG_CONTROL, 0x80 | channels[channel].nIEN);
-    // asm("pushw %es; movw %ds, %ax; movw %ax, %es");
+    // __asm__("pushw %es; movw %ds, %ax; movw %ax, %es");
     if (reg < 0x08)
         insl(channels[channel].base + reg - 0x00, (uint32_t*)buffer, quads);
     else if (reg < 0x0C)
@@ -232,7 +232,7 @@ void ide_read_buffer(unsigned char channel, unsigned char reg,
         insl(channels[channel].ctrl + reg - 0x0A, (uint32_t*)buffer, quads);
     else if (reg < 0x16)
         insl(channels[channel].bmide + reg - 0x0E, (uint32_t*)buffer, quads);
-    // asm("popw %es;");
+    // __asm__("popw %es;");
     if (reg > 0x07 && reg < 0x0C)
         ide_write(channel, ATA_REG_CONTROL, channels[channel].nIEN);
 }
@@ -465,10 +465,10 @@ unsigned char ide_ata_access(unsigned char direction, unsigned char drive,
         for (i = 0; i < numsects; i++) {
             logkf("write %d\n", i);
             ide_polling(channel, 0); // Polling.
-            // asm("pushw %ds");
-            // asm("mov %%ax, %%ds" ::"a"(selector));
-            // asm("rep outsw" ::"c"(words), "d"(bus), "S"(edi));  // Send Data
-            // asm("popw %ds");
+            // __asm__("pushw %ds");
+            // __asm__("mov %%ax, %%ds" ::"a"(selector));
+            // __asm__("rep outsw" ::"c"(words), "d"(bus), "S"(edi));  // Send Data
+            // __asm__("popw %ds");
             for (int h = 0; h < words; h++) {
                 io_out16(bus, word_[i * words + h]);
             }
@@ -683,7 +683,7 @@ void ide_atapi_eject(unsigned char drive) {
         // (VI): Sending the packet data:
         // ------------------------------------------------------------------
 
-        asm("rep   outsw"::"c"(6), "d"(bus),
+        __asm__("rep   outsw"::"c"(6), "d"(bus),
         "S"(atapi_packet));        // Send Packet Data
         ide_wait_irq();                // Wait for an IRQ.
         err = ide_polling(channel, 1); // Polling and get error code.

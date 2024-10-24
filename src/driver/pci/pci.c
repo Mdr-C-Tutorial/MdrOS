@@ -1,6 +1,7 @@
 #include "pci.h"
 #include "io.h"
 #include "klog.h"
+#include "krlibc.h"
 #include "kmalloc.h"
 
 unsigned int PCI_ADDR_BASE;

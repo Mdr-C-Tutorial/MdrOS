@@ -3,6 +3,7 @@
 #include "klog.h"
 #include "tty.h"
 #include "scheduler.h"
+#include "krlibc.h"
 #include "io.h"
 #include "description_table.h"
 
@@ -50,7 +51,7 @@ static void switch_to_user_mode(uint32_t func) {
     iframe.esp = esp; // 设置用户态堆栈
 
     intr_frame_t  *a = &iframe;
-    asm volatile("movl %0, %%esp\n"
+    __asm__ volatile("movl %0, %%esp\n"
                  "popa\n"
                  "pop %%gs\n"
                  "pop %%fs\n"
@@ -60,7 +61,7 @@ static void switch_to_user_mode(uint32_t func) {
 }
 
 _Noreturn static void process_exit(){
-    register uint32_t eax asm("eax");
+    register uint32_t eax __asm__("eax");
     printk("Kernel Process exit, Code: %d\n",eax);
     kill_proc(current_pcb);
     while (1);
