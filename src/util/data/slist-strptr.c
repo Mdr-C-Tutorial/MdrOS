@@ -1,5 +1,6 @@
 #include "slist-strptr.h"
 #include "kmalloc.h"
+#include "krlibc.h"
 #include "klog.h"
 
 slist_sp_t slist_sp_alloc(const char *key, void *val) {

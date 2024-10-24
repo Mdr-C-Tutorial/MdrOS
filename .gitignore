@@ -1,6 +1,11 @@
-.vscode/
+# Xmake cache
+.xmake/
+build/
+CMakeLists.txt
+
+# IDE Config
 .idea/
-/cmake-build-debug
-/CMakeLists.txt
-/target
-/mdros.iso
+.vscode/
+
+# MacOS Cache
+.DS_Store

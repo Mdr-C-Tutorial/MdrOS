@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ctypes.h"
-#include "krlibc.h"
 
 #define u_char unsigned char
 #define u_long unsigned long
