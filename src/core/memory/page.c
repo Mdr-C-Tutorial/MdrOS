@@ -26,28 +26,28 @@ static void set_frame(uint32_t frame_addr) { //设置物理块为占用
     uint32_t frame = frame_addr / PAGE_SIZE;
     uint32_t idx = INDEX_FROM_BIT(frame);
     uint32_t off = OFFSET_FROM_BIT(frame);
-    frames[idx] |= (0x1 << off);
+    frames[idx] |= (0x1U << off);
 }
 
 static void clear_frame(uint32_t frame_addr) { //释放物理块
     uint32_t frame = frame_addr / PAGE_SIZE;
     uint32_t idx = INDEX_FROM_BIT(frame);
     uint32_t off = OFFSET_FROM_BIT(frame);
-    frames[idx] &= ~(0x1 << off);
+    frames[idx] &= ~(0x1U << off);
 }
 
 static uint32_t test_frame(uint32_t frame_addr) {
     uint32_t frame = frame_addr / PAGE_SIZE;
     uint32_t idx = INDEX_FROM_BIT(frame);
     uint32_t off = OFFSET_FROM_BIT(frame);
-    return (frames[idx] & (0x1 << off));
+    return (frames[idx] & (0x1U << off));
 }
 
 uint32_t first_frame() { //获取第一个空闲物理块
     for (int i = 0; i < INDEX_FROM_BIT(0xFFFFFFFF / PAGE_SIZE); i++) {
         if (frames[i] != 0xffffffff) {
             for (int j = 0; j < 32; j++) {
-                uint32_t toTest = 0x1 << j;
+                uint32_t toTest = 0x1U << j;
                 if (!(frames[i] & toTest)) {
                     return i * 4 * 8 + j;
                 }
