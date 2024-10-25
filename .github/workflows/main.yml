@@ -27,9 +27,6 @@ jobs:
       with:
         xmake-version: latest
         actions-cache-folder: '.xmake-cache'
-      run: |
-        apt install xorriso
-        apt install 
         
     - name: Build Kernel
       run: |
