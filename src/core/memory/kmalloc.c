@@ -41,10 +41,6 @@ void *sbrk(int incr) { //内核堆扩容措施
     return prev_break;
 }
 
-static void morecore();
-
-static int findbucket();
-
 union overhead {
     union overhead *ov_next;    /* when free */
     struct {
@@ -73,6 +69,10 @@ static int pagesz;            /* page size */
 static int pagebucket;            /* page size bucket */
 
 #define    ASSERT(p)
+
+static void morecore(int bucket);
+
+static int findbucket(union overhead *freep, int srchlen);
 
 void *kmalloc(size_t nbytes) {
     register union overhead *op;

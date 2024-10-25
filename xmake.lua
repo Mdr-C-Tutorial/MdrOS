@@ -1,38 +1,28 @@
 set_project("MdrOS")
 
 add_rules("mode.debug", "mode.release")
-add_requires("zig")
-add_requires("nasm")
+add_requires("zig", "nasm")
 
-set_languages("c23")
-set_arch("x86")
-
--- set_optimize("none")
--- set_policy("build.optimization.lto", true)
-
-target("asm")
-    set_kind("object")
-    set_toolchains("nasm")
-
-    add_files("src/**/*.asm")
-    add_asflags("-f", "elf32", {force = true})
+set_optimize("none")
 
 target("kernel")
     set_kind("binary")
-    add_deps("asm")
-    set_toolchains("@zig")
+    set_languages("c23")
+    set_toolchains("zig", "nasm")
 
     add_linkdirs("lib")
     add_includedirs("src/include")
 
     add_links("os_terminal")
-    add_files("src/**/*.c")
+    add_files("src/**/*.asm", "src/**/*.c")
 
+    add_asflags("-f", "elf32", {force = true})
     add_cflags("-target x86-freestanding", {force = true})
     add_ldflags("-target x86-freestanding", {force = true})
 
     add_ldflags("-T", "linker.ld", {force = true})
     add_cflags("-Wno-macro-redefined", "-Wno-int-conversion", {force = true})
+    add_cflags("-Wno-incompatible-pointer-types", {force = true})
 
 target("iso")
     set_kind("phony")
