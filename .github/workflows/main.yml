@@ -1,0 +1,25 @@
+name: Xmake on multiple platforms
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: XmakeBuild
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup BuildTools
+      uses: xmake-io/github-action-setup-xmake@v1
+      with:
+        xmake-version: latest
+        
+    - name: Build Kernel
+      run: |
+        xmake build -y
+# uses: softprops/action-gh-release@v2 # 自动上传到release
