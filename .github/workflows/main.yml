@@ -14,16 +14,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Nasm
-      uses: ilammy/setup-nasm@v1
+    - uses: ilammy/setup-nasm@v1
+    - uses: goto-bus-stop/setup-zig@v2
 
-    - name: Setup Zig
-      uses: goto-bus-stop/setup-zig@v2
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y grub-pc-bin xorriso mtools
+    - name: APT Dependencies
+      uses: daaku/gh-action-apt-install@v4
+      with:
+        packages: grub-pc-bin xorriso mtools
 
     - name: Setup BuildTools
       uses: xmake-io/github-action-setup-xmake@v1
