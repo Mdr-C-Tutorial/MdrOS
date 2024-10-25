@@ -11,7 +11,7 @@ asm = "nasm"
 casm = "as"
 ld = "ld"
 
-c_flags = "-w -m32 -nostdlib -ffreestanding -c -Wincompatible-pointer-types -Wall -Wextra -I"+include_dir
+c_flags = "-m32 -nostdlib -ffreestanding -c -Wincompatible-pointer-types -Wall -Wextra -I"+include_dir
 asm_flags = "-f elf32"
 
 build_command = "grub-mkrescue -o mdros.iso iso_img"

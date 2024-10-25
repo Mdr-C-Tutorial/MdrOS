@@ -31,13 +31,15 @@ target("iso")
 
     on_build(function (target)
         import("core.project.project")
-
         local iso_dir = "$(buildir)/iso"
+
+        if os.exists(iso_dir) then
+            os.rmdir(iso_dir)
+        end
+
+        os.cp("iso", iso_dir)
         local target = project.target("kernel")
         os.cp(target:targetfile(), iso_dir .. "/kernel.elf")
-
-        os.mkdir(iso_dir .. "/boot/grub")
-        os.cp("grub.cfg", iso_dir .. "/boot/grub")
 
         local iso_file = "$(buildir)/mdros.iso"
         os.run("grub-mkrescue -o " .. iso_file .. " " .. iso_dir)
@@ -50,6 +52,6 @@ target("qemu")
     set_default(false)
 
     on_build(function (target)
-        local flags = "-serial stdio -device sb16 -m 4096"
+        local flags = "-device sb16 -m 4096"
         os.run("qemu-system-i386 -cdrom $(buildir)/mdros.iso " .. flags)
     end)

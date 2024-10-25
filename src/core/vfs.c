@@ -1,10 +1,9 @@
-#if !(defined(__GNUC__) && (defined(__i386) || defined(__x86_64__) || defined(__amd64__)))
-#define ALL_IMPLEMENTATION
-#endif
-#include "vfs.h"
 #include "krlibc.h"
 #include "kmalloc.h"
 
+#define ALL_IMPLEMENTATION
+
+#include "vfs.h"
 #include "list.h"
 
 vfs_node_t rootdir = NULL;

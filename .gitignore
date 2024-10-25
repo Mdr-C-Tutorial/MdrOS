@@ -3,6 +3,10 @@
 build/
 CMakeLists.txt
 
+# Build.py cache
+/target
+mdros.iso
+
 # IDE Config
 .idea/
 .vscode/
