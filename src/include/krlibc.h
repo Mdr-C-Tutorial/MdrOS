@@ -1,5 +1,7 @@
 #pragma once
 
+#define KERNEL_NAME "CP_Kernel-i386-0.4.0"
+
 #define KHEAP_INITIAL_SIZE 0xf00000
 #define STACK_SIZE 32768
 #define USER_AREA_START 0x90000000
@@ -28,7 +30,7 @@ typedef struct _xstr {
 } *xstr;
 
 int vsprintf(char *buf, const char *fmt, va_list args);
-
+int sprintf(char *buf, const char *fmt, ...);
 void memclean(char *s, int len);
 void* memcpy(void* s, const void* ct, size_t n);
 int memcmp(const void *a_, const void *b_, uint32_t size);
@@ -51,24 +53,24 @@ void sleep(uint32_t time);
 
 #define streq(s1, s2)                                                                              \
   ({                                                                                               \
-    char* _s1 = (s1), _s2 = (s2);                                                                   \
+    char* _s1 = (s1), *_s2 = (s2);                                                                  \
     (_s1 && _s2) ? strcmp(_s1, _s2) == 0 : _s1 == _s2;                                             \
   })
 
 #define strneq(s1, s2, n)                                                                          \
   ({                                                                                               \
-    char* _s1 = (s1), _s2 = (s2);                                                                   \
+    char* _s1 = (s1), *_s2 = (s2);                                                                   \
     (_s1 && _s2) ? strncmp(_s1, _s2, n) == 0 : _s1 == _s2;                                         \
   })
 
 #define xstreq(s1, s2)                                                                             \
   ({                                                                                               \
-    xstr _s1 = (s1), _s2 = (s2);                                                                   \
+    xstr _s1 = (s1), *_s2 = (s2);                                                                   \
     (_s1 && _s2) ? (_s1->hash == _s2->hash ? xstrcmp(_s1, _s2) == 0 : false) : _s1 == _s2;         \
   })
 
 #define memeq(s1, s2, n)                                                                           \
   ({                                                                                               \
-    char* _s1 = (s1), _s2 = (s2);                                                                   \
+    char* _s1 = (s1), *_s2 = (s2);                                                                   \
     (_s1 && _s2) ? memcmp(_s1, _s2, n) == 0 : _s1 == _s2;                                          \
   })

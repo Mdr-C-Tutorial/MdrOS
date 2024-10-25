@@ -4,7 +4,7 @@ add_rules("mode.debug", "mode.release")
 add_requires("zig")
 add_requires("nasm")
 
-set_languages("c99")
+set_languages("c23")
 set_arch("x86")
 
 -- set_optimize("none")

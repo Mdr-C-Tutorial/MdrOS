@@ -64,7 +64,10 @@ PCI设备驱动部分
 
 内核内置文件系统实现
 
+### devfs
+
 * `devfs.c` Device File System
+* `devfs_sysinfo.c` 系统信息构建
 
 ## util
 

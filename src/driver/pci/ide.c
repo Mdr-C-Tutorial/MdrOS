@@ -172,14 +172,18 @@ void ide_initialize(unsigned int BAR0, unsigned int BAR1, unsigned int BAR2,
             strcpy(vd.DriveName, ide_devices[i].Model);
             if(ide_devices[i].Type == IDE_ATAPI) {
                 vd.flag = 2;
+                vd.sector_size = 2048;
+                sprintf(vd.disk_id,"ide_atapi%d",i);
             } else {
                 vd.flag = 1;
+                sprintf(vd.disk_id,"ide%d",i);
             }
 
             vd.Read = Read;
             vd.Write = Write;
             vd.size = ide_devices[i].Size;
-            printk("Disk-(dev/%d) Size: %dMB | %s | Name: %s\n", register_vdisk(vd), vd.size,(const char *[]) {"ATA", "ATAPI"}[ide_devices[i].Type], vd.DriveName);
+            register_vdisk(vd);
+            printk("Disk-(dev/mnt/%s) Size: %dMB | %s | Name: %s\n", vd.disk_id, vd.size,(const char *[]) {"ATA", "ATAPI"}[ide_devices[i].Type], vd.DriveName);
         }
 }
 

@@ -5,10 +5,12 @@
 #include "krlibc.h"
 #include "kmalloc.h"
 #include "page.h"
+#include "scheduler.h"
 
 int devfs_id = 0;
 extern vdisk vdisk_ctl[26]; // core/vdisk.c
 rbtree_sp_t  dev_rbtree;
+vfs_node_t device_fs_node;
 
 static void dummy() {}
 
@@ -27,8 +29,8 @@ void print_devfs(){
 int devfs_mount(char* src, vfs_node_t node) {
     node->fsid = devfs_id;
     for (int i = 0; have_vdisk(i); i++) {
-        vfs_child_append(node, vdisk_ctl[i].DriveName, NULL);
-        rbtree_sp_insert(dev_rbtree, vdisk_ctl[i].DriveName, (void *)i);
+        vfs_child_append(node, vdisk_ctl[i].disk_id, NULL);
+        rbtree_sp_insert(dev_rbtree, vdisk_ctl[i].disk_id, (void *)i);
     }
     return 0;
 }
@@ -97,10 +99,19 @@ static struct vfs_callback callbacks = {
 
 void devfs_regist() {
     devfs_id = vfs_regist("devfs", &callbacks);
+    vfs_mkdir("/dev");
+    vfs_mkdir("/dev/mnt");
+    device_fs_node = vfs_open("/dev/mnt");
+    vfs_mount(NULL, device_fs_node);
 
-    vfs_node_t *node = vfs_node_alloc(get_rootdir(),"dev");
+    devfs_sysinfo_init();
 
-    devfs_mount("acpi",node);
+    vfs_node_t p = vfs_open("/dev");
+    list_foreach(p->child, i) {
+        vfs_node_t c = (vfs_node_t)i->data;
+        printk("%s ", c->name);
+    }
+    printk("\n");
 
     klogf(true,"Device File System initialize.\n");
 }

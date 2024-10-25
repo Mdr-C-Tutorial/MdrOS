@@ -488,6 +488,7 @@ long int strtol(const char *str, char **endptr, int base) {
         acc = neg ? LONG_MIN : LONG_MAX;
     } else if (!any) {
         noconv:
+        {}
     } else if (neg)
         acc = -acc;
     if (endptr != NULL)
@@ -547,6 +548,16 @@ int isalpha(int c) {
 
 int isupper(int c) {
     return (c >= 'A' && c <= 'Z');
+}
+
+int sprintf(char *buf, const char *fmt, ...) {
+    va_list args;
+    int i;
+
+    va_start(args, fmt);
+    i = vsprintf(buf, fmt, args);
+    va_end(args);
+    return i;
 }
 
 void sleep(uint32_t time){

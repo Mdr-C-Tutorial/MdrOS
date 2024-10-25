@@ -1,13 +1,10 @@
 #include "vfs.h"
 #include "krlibc.h"
 #include "kmalloc.h"
-#include "klog.h"
+
+#include "list.h"
 
 vfs_node_t rootdir = NULL;
-
-vfs_node_t get_rootdir(){
-    return rootdir;
-}
 
 static void empty_func() {}
 
@@ -45,6 +42,10 @@ static void do_update(vfs_node_t file) {
 
 static vfs_node_t vfs_child_find(vfs_node_t parent, char* name) {
     return list_first(parent->child, data, streq(name, ((vfs_node_t)data)->name));
+}
+
+vfs_node_t get_rootdir(){
+    return rootdir;
 }
 
 vfs_node_t vfs_child_append(vfs_node_t parent, char* name, void *handle) {
@@ -271,6 +272,5 @@ bool vfs_init() {
 
     rootdir       = vfs_node_alloc(NULL, NULL);
     rootdir->type = file_dir;
-    klogf(true,"Virtual File System initialize.\n");
     return true;
 }
