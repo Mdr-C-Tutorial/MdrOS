@@ -39,7 +39,7 @@ target("iso")
 
         os.cp("iso", iso_dir)
         local target = project.target("kernel")
-        os.cp(target:targetfile(), iso_dir .. "/kernel.elf")
+        os.cp(target:targetfile(), iso_dir .. "/sys/cpkrnl.elf")
 
         local iso_file = "$(buildir)/mdros.iso"
         os.run("grub-mkrescue -o " .. iso_file .. " " .. iso_dir)
