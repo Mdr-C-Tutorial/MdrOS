@@ -14,8 +14,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup NASM
-      uses: ilammy/setup-nasm@v1
+    - uses: ilammy/setup-nasm@v1
+    - uses: goto-bus-stop/setup-zig@v2
 
     - name: Setup BuildTools
       uses: xmake-io/github-action-setup-xmake@v1

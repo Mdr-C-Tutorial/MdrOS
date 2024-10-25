@@ -10,6 +10,7 @@ mdros.iso
 # IDE Config
 .idea/
 .vscode/
+cmake-build-debug/
 
 # MacOS Cache
 .DS_Store
