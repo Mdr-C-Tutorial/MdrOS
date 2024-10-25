@@ -14,6 +14,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y grub-pc-bin xorriso mtools
+
     - uses: ilammy/setup-nasm@v1
     - uses: goto-bus-stop/setup-zig@v2
 
@@ -22,6 +27,9 @@ jobs:
       with:
         xmake-version: latest
         actions-cache-folder: '.xmake-cache'
+      run: |
+        apt install xorriso
+        apt install 
         
     - name: Build Kernel
       run: |
