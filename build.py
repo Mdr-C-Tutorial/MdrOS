@@ -1,3 +1,8 @@
+"""
+CoolPotOS build.py
+2024/4/9 - 2024/10/26
+* 原生Python构建脚本, 已退役(现由xmake取代)
+"""
 import os
 from threading import Thread
 import time
