@@ -1,5 +1,6 @@
 #pragma once
 #include "ctypes.h"
+#include "kmalloc.h"
 
 #pragma GCC system_header
 
@@ -138,7 +139,7 @@ extern void list_print(list_t list);
 #ifdef LIST_IMPLEMENTATION
 
 static list_t list_alloc(void *data) {
-  list_t node = malloc(sizeof(*node));
+  list_t node = kmalloc(sizeof(*node));
   if (node == NULL) return NULL;
   node->data = data;
   node->prev = NULL;
@@ -149,7 +150,7 @@ static list_t list_alloc(void *data) {
 static list_t list_free(list_t list) {
   while (list != NULL) {
     list_t next = list->next;
-    free(list);
+    kfree(list);
     list = next;
   }
   return NULL;
@@ -159,7 +160,7 @@ static list_t list_free_with(list_t list, void (*free_data)(void *)) {
   while (list != NULL) {
     list_t next = list->next;
     free_data(list->data);
-    free(list);
+    kfree(list);
     list = next;
   }
   return NULL;
@@ -200,7 +201,7 @@ static void *list_pop(list_t *list_p) {
   if (*list_p == list) *list_p = list->prev;
   if (list->prev) list->prev->next = NULL;
   auto data = list->data;
-  free(list);
+  kfree(list);
   return data;
 }
 
@@ -251,7 +252,7 @@ static list_t list_delete(list_t list, void *data) {
   if (list->data == data) {
     list_t temp = list;
     list        = list->next;
-    free(temp);
+    kfree(temp);
     return list;
   }
 
@@ -259,7 +260,7 @@ static list_t list_delete(list_t list, void *data) {
     if (current->data == data) {
       current->prev->next = current->next;
       if (current->next != NULL) current->next->prev = current->prev;
-      free(current);
+      kfree(current);
       break;
     }
   }
@@ -274,7 +275,7 @@ static list_t list_delete_with(list_t list, void *data, free_t callback) {
     list_t temp = list;
     list        = list->next;
     if (callback) callback(temp->data);
-    free(temp);
+    kfree(temp);
     return list;
   }
 
@@ -283,7 +284,7 @@ static list_t list_delete_with(list_t list, void *data, free_t callback) {
       current->prev->next = current->next;
       if (current->next != NULL) current->next->prev = current->prev;
       if (callback) callback(current->data);
-      free(current);
+      kfree(current);
       break;
     }
   }
@@ -297,13 +298,13 @@ static list_t list_delete_node(list_t list, list_t node) {
   if (list == node) {
     list_t temp = list;
     list        = list->next;
-    free(temp);
+    kfree(temp);
     return list;
   }
 
   node->prev->next = node->next;
   if (node->next != NULL) node->next->prev = node->prev;
-  free(node);
+  kfree(node);
   return list;
 }
 
@@ -314,14 +315,14 @@ static list_t list_delete_node_with(list_t list, list_t node, free_t callback) {
     list_t temp = list;
     list        = list->next;
     if (callback) callback(temp->data);
-    free(temp);
+    kfree(temp);
     return list;
   }
 
   node->prev->next = node->next;
   if (node->next != NULL) node->next->prev = node->prev;
   if (callback) callback(node->data);
-  free(node);
+  kfree(node);
   return list;
 }
 

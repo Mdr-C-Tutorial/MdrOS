@@ -35,6 +35,7 @@ typedef struct tty_device{
     int x, y;
     uint32_t color, back_color;
     struct FIFO8 *fifo;
+    char name[50];
 }tty_t;
 
 tty_t* default_tty_alloc();

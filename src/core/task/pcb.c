@@ -18,6 +18,8 @@ extern void *program_break_end;
 extern page_directory_t *kernel_directory;
 extern tty_t default_tty;
 
+extern void pipfs_init(); //fs/pipfs.c
+
 static void add_task(pcb_t *new_task){ //添加进程至调度链
     if(new_task == NULL) return;
     pcb_t *tailt = running_proc_head;
@@ -72,7 +74,7 @@ int create_user_proc(uint32_t _user_start,char *args,char* name){ //创建用户
     memset(new_task, 0, sizeof(pcb_t));
 
     new_task->task_level = TASK_APPLICATION_LEVEL;
-    new_task->name = name;
+    strcpy(new_task->name,name);
     new_task->pid = now_pid++;
     new_task->program_break = program_break;
     new_task->program_break_end = program_break_end;
@@ -102,7 +104,7 @@ int create_kernel_thread(int (*_start)(void* arg),void *args,char* name){ //创�
     memset(new_task, 0, sizeof(pcb_t));
 
     new_task->task_level = TASK_KERNEL_LEVEL;
-    new_task->name = name;
+    strcpy(new_task->name,name);
     new_task->pid = now_pid++;
     new_task->program_break = program_break;
     new_task->program_break_end = program_break_end;
@@ -169,7 +171,7 @@ void init_pcb(){
 
     current_pcb->task_level = TASK_KERNEL_LEVEL;
     current_pcb->pid = now_pid++;
-    current_pcb->name = "CP_IDLE";
+    strcpy(current_pcb->name,"CP_IDLE");
     current_pcb->next = current_pcb;
     current_pcb->kernel_stack = current_pcb;
     current_pcb->tty = &default_tty;
@@ -181,4 +183,5 @@ void init_pcb(){
 
     running_proc_head = current_pcb;
     klogf(true,"Load task schedule. | KernelProcessName: %s PID: %d\n",current_pcb->name,current_pcb->pid);
+    pipfs_init();
 }

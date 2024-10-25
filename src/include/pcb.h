@@ -44,7 +44,7 @@ struct context{
 typedef struct task_pcb{
     uint8_t task_level;           // 进程等级< 0:内核 | 1:系统服务 | 2:应用程序 >
     int pid;
-    char* name;
+    char name[50];
     void* user_stack;             //用户栈
     void* kernel_stack;           //内核栈
     void* program_break;          // 进程堆基址
