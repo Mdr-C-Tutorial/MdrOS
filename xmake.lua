@@ -42,7 +42,7 @@ target("iso")
         os.cp(target:targetfile(), iso_dir .. "/sys/cpkrnl.elf")
 
         local iso_file = "$(buildir)/mdros.iso"
-        os.run("grub-mkrescue -o " .. iso_file .. " " .. iso_dir)
+        os.run("grub-mkrescue -o %s %s", iso_file, iso_dir)
         print("ISO image created at: " .. iso_file)
     end)
 
@@ -53,15 +53,5 @@ target("qemu")
 
     on_build(function (target)
         local flags = "-device sb16 -m 4096"
-        os.run("qemu-system-i386 -cdrom $(buildir)/mdros.iso " .. flags)
+        os.run("qemu-system-i386 -cdrom $(buildir)/mdros.iso %s", flags)
     end)
-
-target("qemudebug")
-    set_kind("phony")
-        add_deps("iso")
-        set_default(false)
-
-        on_build(function (target)
-            local flags = "-device sb16 -m 4096 -S -s"
-            os.run("qemu-system-i386 -cdrom $(buildir)/mdros.iso " .. flags)
-        end)

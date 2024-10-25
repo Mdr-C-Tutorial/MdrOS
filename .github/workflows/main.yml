@@ -14,13 +14,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - uses: ilammy/setup-nasm@v1
-    - uses: goto-bus-stop/setup-zig@v2
-
-    - name: APT Dependencies
-      uses: daaku/gh-action-apt-install@v4
+    - name: Install packages
+      uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: grub-pc-bin xorriso mtools
+        packages: grub-pc-bin xorriso mtools nasm
+        version: 1.0
+
+    - name: Setup Zig
+      uses: goto-bus-stop/setup-zig@v2
 
     - name: Setup BuildTools
       uses: xmake-io/github-action-setup-xmake@v1
@@ -29,6 +30,8 @@ jobs:
         actions-cache-folder: '.xmake-cache'
         
     - name: Build Kernel
-      run: |
-        xmake build -y
-# uses: softprops/action-gh-release@v2 # 自动上传到release
+      run: xmake build -y
+        
+    - uses: actions/upload-artifact@v4
+      name: Bootable ISO
+      path: build/mdros.iso
