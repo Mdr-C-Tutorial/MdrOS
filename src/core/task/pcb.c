@@ -6,6 +6,7 @@
 #include "krlibc.h"
 #include "io.h"
 #include "description_table.h"
+#include "devfs.h"
 
 extern pcb_t *current_pcb;
 extern pcb_t *running_proc_head;
@@ -17,8 +18,6 @@ extern void *program_break;
 extern void *program_break_end;
 extern page_directory_t *kernel_directory;
 extern tty_t default_tty;
-
-extern void pipfs_init(); //fs/pipfs.c
 
 static void add_task(pcb_t *new_task){ //添加进程至调度链
     if(new_task == NULL) return;
@@ -149,6 +148,7 @@ void kill_proc(pcb_t *pcb){
         if (head->pid == pcb->pid) {
             last->next = pcb->next;
             kfree(pcb);
+            update_pipfs();
             io_sti();
             return;
         }
@@ -183,5 +183,4 @@ void init_pcb(){
 
     running_proc_head = current_pcb;
     klogf(true,"Load task schedule. | KernelProcessName: %s PID: %d\n",current_pcb->name,current_pcb->pid);
-    pipfs_init();
 }

@@ -106,13 +106,6 @@ void devfs_regist() {
 
     devfs_sysinfo_init();
 
-    vfs_node_t p = vfs_open("/dev");
-    list_foreach(p->child, i) {
-        vfs_node_t c = (vfs_node_t)i->data;
-        printk("%s ", c->name);
-    }
-    printk("\n");
-
     klogf(true,"Device File System initialize.\n");
 }
 

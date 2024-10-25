@@ -5,24 +5,29 @@ add_requires("zig", "nasm")
 
 set_optimize("none")
 
+target("asm")
+    set_kind("object")
+    set_toolchains("nasm")
+
+    add_files("src/**/*.asm")
+    add_asflags("-f", "elf32", {force = true})
+
 target("kernel")
     set_kind("binary")
+    add_deps("asm")
     set_languages("c23")
-    set_toolchains("zig", "nasm")
-
-    add_linkdirs("lib")
-    add_includedirs("src/include")
+    set_toolchains("zig")
 
     add_links("os_terminal")
-    add_files("src/**/*.asm", "src/**/*.c")
+    add_files("src/**/*.c")
 
-    add_asflags("-f", "elf32", {force = true})
     add_cflags("-target x86-freestanding", {force = true})
     add_ldflags("-target x86-freestanding", {force = true})
 
     add_ldflags("-T", "linker.ld", {force = true})
     add_cflags("-Wno-macro-redefined", "-Wno-int-conversion", {force = true})
     add_cflags("-Wno-incompatible-pointer-types", {force = true})
+    add_cflags("-O0", {force = true})
 
 target("iso")
     set_kind("phony")
@@ -55,3 +60,13 @@ target("qemu")
         local flags = "-device sb16 -m 4096"
         os.run("qemu-system-i386 -cdrom $(buildir)/mdros.iso " .. flags)
     end)
+
+target("qemudebug")
+    set_kind("phony")
+        add_deps("iso")
+        set_default(false)
+
+        on_build(function (target)
+            local flags = "-device sb16 -m 4096 -S -s"
+            os.run("qemu-system-i386 -cdrom $(buildir)/mdros.iso " .. flags)
+        end)

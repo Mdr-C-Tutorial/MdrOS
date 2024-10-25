@@ -42,6 +42,7 @@ char *strstr(char *str1, char *str2);
 char *strncpy(char *dest, const char *src, unsigned long long count);
 char *strdup(const char *str);
 void strtoupper(char *str);
+char *strchrnul(const char *s, int c);
 int strcmp(const char *s1, const char *s2);
 char *strcpy(char *dest, const char *src);
 char *strcat(char *dest, const char *src);

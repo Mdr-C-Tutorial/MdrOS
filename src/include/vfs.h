@@ -34,6 +34,7 @@ enum {
     file_dir,    // 文件夹
     file_block,  // 块设备，如硬盘
     file_stream, // 流式设备，如终端
+    file_virtual,// 虚拟文件, 如pipfs的进程信息描述
 };
 
 typedef struct vfs_callback { //VFS回调函数

@@ -340,6 +340,14 @@ size_t strlen(const char *str) {
     return len;
 }
 
+char *strchrnul(const char *s, int c) {
+    while (*s) {
+        if ((*s++) == c)
+            break;
+    }
+    return (char *)s;
+}
+
 char *strtok(char *str, const char *delim) {
     static char *src = NULL;
     const char *indelim = delim;

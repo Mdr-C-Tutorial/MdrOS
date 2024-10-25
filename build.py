@@ -14,9 +14,7 @@ ld = "ld"
 c_flags = "-m32 -nostdlib -ffreestanding -c -Wincompatible-pointer-types -Wall -Wextra -I"+include_dir
 asm_flags = "-f elf32"
 
-build_command = "grub-mkrescue -o mdros.iso iso_img"
-
-
+build_command = "grub-mkrescue -o mdros.iso iso"
 
 def clean():
     for file in os.listdir("target"):  # 遍历指定文件夹下所有文件
@@ -47,7 +45,7 @@ def ld_obj():
     files = " "
     for file in os.listdir("target"):
         files += "target/"+file+" "
-    str = ld + " -m elf_i386 -nostdlib -T linker.ld" + " -o iso_img/sys/cpkrnl.elf " + files
+    str = ld + " -m elf_i386 -nostdlib -T linker.ld" + " -o iso/sys/cpkrnl.elf " + files
     print(str)
     if os.system(str) != 0:
         exit(-1)

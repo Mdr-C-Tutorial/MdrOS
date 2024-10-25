@@ -27,6 +27,7 @@ L1:
     hlt
     jmp L1
 
+
 section .bss
 stack_bottom:
 resb 16384 ; 内核栈大小 16KB

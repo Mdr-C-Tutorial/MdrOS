@@ -8,5 +8,5 @@ int dev_get_sector_size(char *path);
 int dev_get_size(char *path);
 int dev_get_type(char *path); //1:HDD 2:CDROM
 void print_devfs();
-
+void update_pipfs();
 void devfs_sysinfo_init();

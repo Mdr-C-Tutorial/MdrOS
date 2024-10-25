@@ -17,6 +17,7 @@
 #include "keyboard.h"
 #include "scheduler.h"
 #include "krlibc.h"
+#include "pipfs.h"
 
 extern void* program_break_end;
 
@@ -61,6 +62,8 @@ _Noreturn void kernel_main(multiboot_t *multiboot,uint32_t kernel_stack){
     devfs_regist();
 
     init_pcb();
+
+    pipfs_init();
 
     keyboard_init();
     create_kernel_thread(test_proc,NULL,"Test");

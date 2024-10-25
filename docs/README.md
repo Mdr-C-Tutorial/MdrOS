@@ -14,7 +14,7 @@
 
 * 详细说明 [src about](KrnlSrc.md)
 
-## iso_img
+## iso
 
 光盘映像目录, 最终的OS ISO文件打包区域, 
 这里可以添加一些内核或应用程序要用的文件, 以及移植的第三方应用程序
@@ -27,13 +27,16 @@ GRUB引导器文件夹
 ### sys
 MdrOS系统文件夹
 
-`cposkrnl.elf` 内核本体
+`cpkrnl.elf` 内核本体
 
-## os_terminal
+## lib
+OS第三方静态库
 
 `libos_terminal.a` os_terminal静态库
 
 ## target
+
+> 仅存在于使用 `build.py` 构建脚本
 
 内核临时目标文件夹, 用于链接源文件与外部静态库
 
