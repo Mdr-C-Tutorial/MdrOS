@@ -13,7 +13,10 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+
+    - name: Setup NASM
+      uses: ilammy/setup-nasm@v1
+
     - name: Setup BuildTools
       uses: xmake-io/github-action-setup-xmake@v1
       with:

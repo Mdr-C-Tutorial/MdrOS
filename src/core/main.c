@@ -58,12 +58,10 @@ _Noreturn void kernel_main(multiboot_t *multiboot,uint32_t kernel_stack){
     init_pci(); //pci设备列表加载, 所有PCI设备相关驱动初始化需在此函数后方调用
 
     ide_init();
-    io_cli(); //ide驱动会打开中断以加载硬盘设备, 需重新关闭中断以继续初始化其余OS功能
+
     devfs_regist();
-
+    io_cli(); //ide驱动会打开中断以加载硬盘设备, 需重新关闭中断以继续初始化其余OS功能
     init_pcb();
-
-    pipfs_init();
 
     keyboard_init();
     create_kernel_thread(test_proc,NULL,"Test");
