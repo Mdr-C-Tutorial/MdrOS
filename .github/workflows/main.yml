@@ -20,9 +20,6 @@ jobs:
         packages: grub-pc-bin xorriso mtools nasm
         version: 1.0
 
-    - name: Setup Zig
-      uses: goto-bus-stop/setup-zig@v2
-
     - name: Setup BuildTools
       uses: xmake-io/github-action-setup-xmake@v1
       with:
