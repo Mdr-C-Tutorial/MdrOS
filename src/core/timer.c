@@ -1,9 +1,10 @@
 #include "timer.h"
 #include "isr.h"
 #include "io.h"
+#include "klog.h"
 #include "scheduler.h"
 
-uint32_t tick = 0;
+volatile uint32_t tick = 0;
 
 static void timer_handle(registers_t *regs) {
     io_cli();
@@ -15,10 +16,7 @@ static void timer_handle(registers_t *regs) {
 void clock_sleep(uint32_t timer){
     io_sti();
     uint32_t sleep = tick + timer;
-    while(1){
-        int a;
-        if(tick >= sleep) break;
-    }
+    while (tick < sleep);
 }
 
 void init_timer(uint32_t timer) {

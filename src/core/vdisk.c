@@ -12,7 +12,7 @@ static uint8_t *drive_name[16] = {NULL, NULL, NULL, NULL, NULL, NULL,
 static struct FIFO8 drive_fifo[16];
 static uint8_t drive_buf[16][256];
 
-int init_vdisk() {
+void init_vdisk() {
     for (int i = 0; i < 26; i++) {
         vdisk_ctl[i].flag = 0; // 设置为未使用
     }

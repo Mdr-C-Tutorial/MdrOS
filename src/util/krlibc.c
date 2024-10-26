@@ -570,5 +570,4 @@ int sprintf(char *buf, const char *fmt, ...) {
 
 void sleep(uint32_t time){
     clock_sleep(time);
-    //usleep(time * 1000);
 }

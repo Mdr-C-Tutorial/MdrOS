@@ -189,7 +189,6 @@ void kfree(void *cp) {
 /* EDB: added size lookup */
 
 size_t kmalloc_usable_size(void *cp) {
-    register long size;
     register union overhead *op;
 
     if (cp == NULL)

@@ -347,7 +347,7 @@ void hpet_initialize() {
 }
 
 void acpi_install() {
-    klogf(AcpiSysInit(),"Load acpi driver.\n");
+    klogf(AcpiSysInit(), "Load acpi driver.\n");
     acpi_enable_flag = !acpi_enable();
     hpet_initialize();
     AcpiPowerInit();

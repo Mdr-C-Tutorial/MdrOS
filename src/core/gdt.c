@@ -7,12 +7,12 @@ gdt_ptr_t gdt_ptr;
 tss_entry tss;
 
 void write_tss(int32_t num, uint16_t ss0, uint32_t esp0) {
-    uintptr_t base = (uintptr_t) & tss;
+    uintptr_t base = (uintptr_t)&tss;
     uintptr_t limit = base + sizeof(tss);
 
     gdt_set_gate(num, base, limit, 0xE9, 0x00);
 
-    memset((uint8_t * ) & tss, 0x0, sizeof(tss));
+    memset(&tss, 0x0, sizeof(tss));
 
     tss.ss0 = ss0;
     tss.esp0 = esp0;
@@ -54,7 +54,8 @@ void gdt_install() {
 
     gdt_flush((uint32_t)&gdt_ptr);
 
-    register uint32_t esp __asm__("esp");
+    uint32_t esp;
+    __asm__ volatile ("mov %%esp, %0" : "=r"(esp));
 
     write_tss(5, 0x10, esp);
     tss_flush();

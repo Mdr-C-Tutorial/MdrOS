@@ -1,18 +1,18 @@
 section .multiboot
 
 dd 0x1badb002 ; 文件魔术头, 内核识别码
-dd 7 ; FLAGS
+dd 7          ; FLAGS
 dd -464367625 ;-(MAGIC + FLAGS)
-dd 0 ;HEADER_ADDR
-dd 0 ;LOAD_ADDR
-dd 0 ;LOAD_END_ADDR
-dd 0 ;BSS_END_ADDR
-dd 0 ;ENTRY_ADDR
-dd 0 ;MODE_TYPE
-dd 1280 ;WIDTH
-dd 768  ;HEIGHT
-dd 32   ;DEPTH
-resb 4 * 13
+dd 0          ;HEADER_ADDR
+dd 0          ;LOAD_ADDR
+dd 0          ;LOAD_END_ADDR
+dd 0          ;BSS_END_ADDR
+dd 0          ;ENTRY_ADDR
+dd 0          ;MODE_TYPE
+dd 1280       ;WIDTH
+dd 768        ;HEIGHT
+dd 32         ;DEPTH
+times 52 db 0 ; 显式初始化 52 个字节为零
 
 section .text
 global _start
