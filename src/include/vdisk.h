@@ -12,7 +12,7 @@ typedef struct {
     char disk_id[50];
 } vdisk;
 
-int init_vdisk();
+void init_vdisk();
 int register_vdisk(vdisk vd);
 int logout_vdisk(int drive);
 int rw_vdisk(int drive, uint32_t lba, uint8_t *buffer, uint32_t number, int read);

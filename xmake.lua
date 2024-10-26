@@ -3,7 +3,8 @@ set_project("MdrOS")
 add_rules("mode.debug", "mode.release")
 add_requires("zig", "nasm")
 
-set_optimize("none")
+set_optimize("fastest")
+set_warnings("all", "extra")
 
 target("kernel")
     set_kind("binary")
@@ -21,6 +22,7 @@ target("kernel")
     add_ldflags("-target x86-freestanding", {force = true})
 
     add_ldflags("-T", "linker.ld", {force = true})
+    add_cflags("-m32", "-mno-80387", "-mno-mmx", "-mno-sse", "-mno-sse2", {force = true})
     add_cflags("-Wno-macro-redefined", "-Wno-int-conversion", {force = true})
     add_cflags("-Wno-incompatible-pointer-types", {force = true})
 
@@ -39,7 +41,7 @@ target("iso")
 
         os.cp("iso", iso_dir)
         local target = project.target("kernel")
-        os.cp(target:targetfile(), iso_dir .. "/sys/cpkrnl.elf")
+        os.cp(target:targetfile(), iso_dir .. "/cpkrnl.elf")
 
         local iso_file = "$(buildir)/mdros.iso"
         os.run("grub-mkrescue -o %s %s", iso_file, iso_dir)
@@ -52,6 +54,6 @@ target("qemu")
     set_default(false)
 
     on_build(function (target)
-        local flags = "-device sb16 -m 4096"
-        os.run("qemu-system-i386 -cdrom $(buildir)/mdros.iso %s", flags)
+        local flags = "-device sb16 -m 4096 -no-reboot"
+        os.exec("qemu-system-i386 -cdrom $(buildir)/mdros.iso %s", flags)
     end)

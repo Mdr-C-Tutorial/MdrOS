@@ -21,19 +21,20 @@
 
 extern void* program_break_end;
 
-int test_proc(){
+int test_proc() {
     while(1) printk("%c\n",kernel_getch());
     return -1;
 }
+
 /*
  * 内核初始化函数, 最终会演变为CPU0的IDLE进程
  * > 注意, 其所有的函数调用顺序均不可改变. 需按顺序初始化OS功能
  * @Noreturn
  */
-_Noreturn void kernel_main(multiboot_t *multiboot,uint32_t kernel_stack){
+_Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     vga_install();
 
-    if(multiboot->cmdline != (multiboot_uint32_t)NULL){
+    if(multiboot->cmdline != (multiboot_uint32_t)NULL) {
     }
 
     gdt_install();
@@ -51,7 +52,7 @@ _Noreturn void kernel_main(multiboot_t *multiboot,uint32_t kernel_stack){
     printk("KernelArea: 0x00000000 - 0x%08x | GraphicsBuffer: 0x%08x \n",
            program_break_end,
            multiboot->framebuffer_addr);
-    klogf(true,"Memory manager initialize.\n");
+    klogf(true, "Memory manager initialize.\n");
 
     init_vdisk();
     vfs_init();
@@ -64,29 +65,28 @@ _Noreturn void kernel_main(multiboot_t *multiboot,uint32_t kernel_stack){
     init_pcb();
 
     keyboard_init();
-    create_kernel_thread(test_proc,NULL,"Test");
+    create_kernel_thread(test_proc, NULL, "Test");
 
     klogf(true,"Kernel load done!\n");
     enable_scheduler();
     io_sti(); //内核加载完毕, 打开中断以启动进程调度器, 开始运行
-    /*
-    int ret = vfs_mkdir("/dev");
-    printk(" vfs  ret=%d\n",ret);
-    vfs_mount(NULL, vfs_open("/dev"));
-    vfs_node_t p = vfs_open("/");
-    list_foreach(p->child, i) {
-        vfs_node_t c = (vfs_node_t)i->data;
-        printk("%s ", c->name);
-    }
-    printk("\n");
 
-    uint8_t *buf = kmalloc(2048);
-    p = vfs_open("/dev/ide_atapi0");
-    vfs_read(p,buf,2048,2048);
-    for(int i = 0;i<2048;i++) {
-        printk("%02x ",buf[i]);
-    }
-     */
+    // int ret = vfs_mkdir("/dev");
+    // printk(" vfs  ret=%d\n",ret);
+    // vfs_mount(NULL, vfs_open("/dev"));
+    // vfs_node_t p = vfs_open("/");
+    // list_foreach(p->child, i) {
+    //     vfs_node_t c = (vfs_node_t)i->data;
+    //     printk("%s ", c->name);
+    // }
+    // printk("\n");
+
+    // uint8_t *buf = kmalloc(2048);
+    // p = vfs_open("/dev/ide_atapi0");
+    // vfs_read(p,buf,2048,2048);
+    // for(int i = 0;i<2048;i++) {
+    //     printk("%02x ",buf[i]);
+    // }
 
     while(1) io_hlt();
 }

@@ -8,11 +8,10 @@
 extern tty_t default_tty;
 
 void logkf(char *formet,...){
-    int len;
     va_list ap;
     va_start(ap, formet);
     char *buf[1024] = {0};
-    len = vsprintf(buf, formet, ap);
+    vsprintf(buf, formet, ap);
     logk(buf);
     va_end(ap);
 }
@@ -26,11 +25,10 @@ void logk(const char *message){
 }
 
 void printk(const char *formet, ...) {
-    int len;
     va_list ap;
     va_start(ap, formet);
     char *buf[1024] = {0};
-    len = vsprintf(buf, formet, ap);
+    vsprintf(buf, formet, ap);
     k_print(buf);
     va_end(ap);
 }
@@ -39,12 +37,11 @@ void k_print(const char* message){
     default_tty.print(&default_tty,message);
 }
 
-void klogf(bool isok,char* fmt,...){
-    int len;
+void klogf(bool isok, char* fmt, ...){
     va_list ap;
     va_start(ap, fmt);
     char *buf[1024] = {0};
-    len = vsprintf(buf, fmt, ap);
+    vsprintf(buf, fmt, ap);
 
     printk("[%s]: %s",isok ? "  \033[32mOK\033[39m  ":"\033[31mFAILED\033[39m",buf);
 }

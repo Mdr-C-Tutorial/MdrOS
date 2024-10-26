@@ -159,7 +159,6 @@ vfs_node_t vfs_open(char* str) {
     char      *save_ptr = path;
     vfs_node_t current  = rootdir;
     for (char *buf = pathtok(&save_ptr); buf; buf = pathtok(&save_ptr)) {
-        vfs_node_t father = current;
         if (streq(buf, ".")) {
             goto upd;
         } else if (streq(buf, "..")) {
@@ -233,7 +232,6 @@ int vfs_write(vfs_node_t file, void *addr, size_t offset, size_t size) {
 int vfs_mount(char* src, vfs_node_t node) {
     if (node == NULL) return -1;
     if (node->type != file_dir) return -1;
-    void *handle = NULL;
     for (int i = 1; i < fs_nextid; i++) {
         if (fs_callbacks[i]->mount(src, node) == 0) {
             node->fsid = i;
