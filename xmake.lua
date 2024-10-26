@@ -44,7 +44,9 @@ target("iso")
         os.cp(target:targetfile(), iso_dir .. "/cpkrnl.elf")
 
         local iso_file = "$(buildir)/mdros.iso"
-        os.run("grub-mkrescue -o %s %s", iso_file, iso_dir)
+        local grub_flags = "--install-modules=\"normal multiboot\" --locales=\"\""
+
+        os.run("grub-mkrescue %s -o %s %s", grub_flags, iso_file, iso_dir)
         print("ISO image created at: " .. iso_file)
     end)
 

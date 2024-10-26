@@ -8,7 +8,6 @@ SECTIONS
 	.text :
 	{
 	    code = .; _code = .; __code = .;
-		*(.multiboot)
 		*(.text)
 	}
 
