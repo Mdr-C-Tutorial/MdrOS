@@ -48,7 +48,7 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     page_init(multiboot); //分页开启
     terminal_setup();
 
-    printk("MdrOS v0.0.1 %s (GRUB Multiboot) on an i386\n",KERNEL_NAME);
+    printk("MdrOS v0.0.1 %s (Limine Multiboot) on an i386\n",KERNEL_NAME);
     printk("KernelArea: 0x00000000 - 0x%08x | GraphicsBuffer: 0x%08x \n",
            program_break_end,
            multiboot->framebuffer_addr);

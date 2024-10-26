@@ -3,9 +3,9 @@
 #include "page.h"
 #include "klog.h"
 
-extern uint32_t end; //linked.ld
 extern page_directory_t *kernel_directory; //page.c
-void *program_break = &end + 0x1000;
+
+void *program_break = 0x3e0000;
 void *program_break_end;
 
 void *sbrk(int incr) { //内核堆扩容措施

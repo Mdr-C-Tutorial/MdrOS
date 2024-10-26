@@ -17,7 +17,7 @@ jobs:
     - name: Install packages
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: grub-pc-bin xorriso mtools nasm
+        packages: xorriso mtools nasm
         version: 1.0
 
     - name: Setup BuildTools
@@ -31,6 +31,6 @@ jobs:
         
     - uses: actions/upload-artifact@v4
       with:
-        name: Bootable ISO
+        name: MdrOS
         path: build/mdros.iso
         compression-level: 9

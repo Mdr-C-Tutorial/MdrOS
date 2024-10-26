@@ -7,12 +7,8 @@
 #include "acpi.h"
 #include "scheduler.h"
 
-extern uint32_t end; //linker.ld 内核末尾地址
-
 volatile uint32_t *frames;
 volatile uint32_t nframes;
-
-uint32_t placement_address = (uint32_t)&end;
 
 page_directory_t *kernel_directory;
 page_directory_t *current_directory = 0;

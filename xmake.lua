@@ -21,10 +21,10 @@ target("kernel")
     add_cflags("-target x86-freestanding", {force = true})
     add_ldflags("-target x86-freestanding", {force = true})
 
-    add_ldflags("-flto", "-T", "linker.ld", {force = true})
+    add_ldflags("-T", "linker.ld", {force = true})
     add_cflags("-m32", "-mno-80387", "-mno-mmx", "-mno-sse", "-mno-sse2", {force = true})
     add_cflags("-Wno-macro-redefined", "-Wno-int-conversion", {force = true})
-    add_cflags("-flto", "-Wno-incompatible-pointer-types", {force = true})
+    add_cflags("-Wno-incompatible-pointer-types", {force = true})
 
 target("iso")
     set_kind("phony")
@@ -44,9 +44,8 @@ target("iso")
         os.cp(target:targetfile(), iso_dir .. "/cpkrnl.elf")
 
         local iso_file = "$(buildir)/mdros.iso"
-        local grub_flags = "--install-modules=\"normal multiboot\" --locales=\"\""
-
-        os.run("grub-mkrescue %s -o %s %s", grub_flags, iso_file, iso_dir)
+        local xorriso_flags = "-b limine/limine-bios-cd.bin -no-emul-boot -boot-info-table"
+        os.run("xorriso -as mkisofs %s %s -o %s", xorriso_flags, iso_dir, iso_file)
         print("ISO image created at: " .. iso_file)
     end)
 
