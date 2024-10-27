@@ -21,5 +21,5 @@ const char *terminal_handle_keyboard(unsigned char scancode);
 
 static inline void terminal_setup(){
     extern uint32_t tty_status; tty_status = TTY_OST_OUTPUT;
-    terminal_init(get_vbe_width(),get_vbe_height(),get_vbe_screen(),kmalloc,kfree,logk);
+    terminal_init(get_vbe_width(), get_vbe_height(), get_vbe_screen(), kmalloc, kfree, logk);
 }

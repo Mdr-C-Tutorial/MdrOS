@@ -9,7 +9,7 @@ set_warnings("all", "extra")
 target("kernel")
     set_kind("binary")
     set_languages("c23")
-    set_toolchains("zig", "nasm")
+    set_toolchains("@zig", "nasm")
 
     add_linkdirs("lib")
     add_includedirs("src/include")
@@ -44,7 +44,8 @@ target("iso")
         os.cp(target:targetfile(), iso_dir .. "/cpkrnl.elf")
 
         local iso_file = "$(buildir)/mdros.iso"
-        os.run("grub-mkrescue -o %s %s", iso_file, iso_dir)
+        local xorriso_flags = "-b limine/limine-bios-cd.bin -no-emul-boot -boot-info-table"
+        os.run("xorriso -as mkisofs %s %s -o %s", xorriso_flags, iso_dir, iso_file)
         print("ISO image created at: " .. iso_file)
     end)
 
