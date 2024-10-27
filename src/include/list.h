@@ -197,7 +197,7 @@ static list_t list_prepend(list_t list, void *data) {
 
 static void *list_pop(list_t *list_p) {
   if (list_p == NULL || *list_p == NULL) return NULL;
-  auto list = list_tail(*list_p);
+  list_t list = list_tail(*list_p);
   if (*list_p == list) *list_p = list->prev;
   if (list->prev) list->prev->next = NULL;
   auto data = list->data;
