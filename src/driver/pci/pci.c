@@ -196,7 +196,7 @@ uint32_t read_pci(uint8_t bus, uint8_t device, uint8_t function, uint8_t registe
 }
 
 base_address_register get_base_address_register(uint8_t bus, uint8_t device, uint8_t function, uint8_t bar) {
-    base_address_register result;
+    base_address_register result = {0, nullptr_t, 0, 0};
 
     uint32_t headertype = read_pci(bus, device, function, 0x0e) & 0x7e;
     int max_bars = 6 - 4 * headertype;
