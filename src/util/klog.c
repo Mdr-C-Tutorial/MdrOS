@@ -24,11 +24,11 @@ void logk(const char *message){
     }
 }
 
-void printk(const char *formet, ...) {
+void printk(const char *format, ...) {
     va_list ap;
-    va_start(ap, formet);
+    va_start(ap, format);
     char *buf[1024] = {0};
-    vsprintf(buf, formet, ap);
+    vsprintf(buf, format, ap);
     k_print(buf);
     va_end(ap);
 }

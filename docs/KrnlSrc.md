@@ -1,6 +1,6 @@
 # CP_Kernel Source Code directory
 
-`CP_Kernel` 源码文件夹, 存储内核的所有源码文件 
+`CP_Kernel` 源码文件夹, 存储内核的所有源码文件
 
 ~~也是你魔改要操作的主要文件夹~~
 
@@ -9,7 +9,7 @@
 汇编 / 引导源文件的文件夹
 
 * `asmfunc.asm` 常规的内核汇编函数部分
-* `boot.asm` Multiboot头各种标记的存储, 以及引导`kernel_main`函数
+* `boot.asm` Multiboot头各种标记的存储, 以及引导 `kernel_main` 函数
 * `interrupt.asm` 内核中断处理程序的汇编部分
 * `io.asm` 内核I/O操作函数部分
 
@@ -82,7 +82,6 @@ PCI设备驱动部分
 
 一些数据结构算法实现
 
-* `list.c` 双向链表实现
 * `rbtree-strptr.c` 红黑树实现
 * `slist_strptr.c` 单向链表实现
 
