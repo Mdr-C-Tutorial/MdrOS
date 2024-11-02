@@ -39,8 +39,6 @@ void load_idtr(int limit, int addr);
 
 uint16_t inw(uint16_t port);
 
-void copy_page_physical(uint32_t, uint32_t);
-
 extern char read_port(unsigned short port);
 
 static inline uint32_t get_cr0(void) {

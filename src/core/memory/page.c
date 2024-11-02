@@ -7,6 +7,8 @@
 #include "acpi.h"
 #include "scheduler.h"
 
+void copy_page_physical(uint32_t, uint32_t);
+
 volatile uint32_t *frames;
 volatile uint32_t nframes;
 
@@ -123,6 +125,48 @@ static void open_page(){ //打开分页机制
 void switch_page_directory(page_directory_t *dir){
     current_directory = dir;
     __asm__ volatile("mov %0, %%cr3" : : "r"(&dir->table_phy));
+}
+
+static page_table_t *clone_table(page_table_t *src, uint32_t *physAddr) {
+    page_table_t *table = (page_table_t *) kmalloc(sizeof(page_table_t));
+    *physAddr = (uint32_t )table;
+    memset(table, 0, sizeof(page_directory_t));
+
+    int i;
+    for (i = 0; i < 1024; i++) {
+        if (!src->pages[i].frame)
+            continue;
+        alloc_frame(&table->pages[i], 0, 0);
+        if (src->pages[i].present) table->pages[i].present = 1;
+        if (src->pages[i].rw) table->pages[i].rw = 1;
+        if (src->pages[i].user) table->pages[i].user = 1;
+        if (src->pages[i].accessed)table->pages[i].accessed = 1;
+        if (src->pages[i].dirty) table->pages[i].dirty = 1;
+        copy_page_physical(src->pages[i].frame * 0x1000, table->pages[i].frame * 0x1000);
+    }
+
+    return table;
+}
+
+page_directory_t *clone_directory(page_directory_t *src) {
+    page_directory_t *dir = (page_directory_t *) kmalloc(sizeof(page_directory_t));
+
+    memset(dir, 0, sizeof(page_directory_t));
+
+    int i;
+    for (i = 0; i < 1024; i++) {
+        if (!src->tables[i])
+            continue;
+        if (kernel_directory->tables[i] == src->tables[i]) {
+            dir->tables[i] = src->tables[i];
+            dir->table_phy[i] = src->table_phy[i];
+        } else {
+            uint32_t phys;
+            dir->tables[i] = clone_table(src->tables[i], &phys);
+            dir->table_phy[i] = phys | 0x07;
+        }
+    }
+    return dir;
 }
 
 void page_fault(registers_t *regs) {
