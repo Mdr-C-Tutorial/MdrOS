@@ -37,7 +37,6 @@ tty_t* default_tty_alloc(){
     tty->fifo = kmalloc(sizeof(struct FIFO8));
     char* buf = kmalloc(512);
     fifo8_init(tty->fifo, 512, (unsigned char *)buf);
-
     return tty;
 }
 
@@ -55,6 +54,10 @@ void tty_init(void){
     default_tty.move_cursor = tty_move_cursor;
     default_tty.putchar = tty_putchar;
     strcpy(default_tty.name,"ost/default");
+
+    default_tty.fifo = kmalloc(sizeof(struct FIFO8));
+    char* buf = kmalloc(512);
+    fifo8_init(default_tty.fifo, 512, (unsigned char *)buf);
 
     tty_status = TTY_VGA_OUTPUT;
 }
