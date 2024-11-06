@@ -1,6 +1,5 @@
 #include "ide.h"
 #include "io.h"
-#include "isr.h"
 #include "pci.h"
 #include "klog.h"
 #include "krlibc.h"
@@ -183,7 +182,7 @@ void ide_initialize(unsigned int BAR0, unsigned int BAR1, unsigned int BAR2,
             vd.Write = Write;
             vd.size = ide_devices[i].Size;
             register_vdisk(vd);
-            printk("Disk-(dev/mnt/%s) Size: %dMB | %s | Name: %s\n", vd.disk_id, vd.size,(const char *[]) {"ATA", "ATAPI"}[ide_devices[i].Type], vd.DriveName);
+            printk("IDE_Disk-(dev/%s) Size: %dMB | %s | Name: %s\n", vd.disk_id, vd.size,(const char *[]) {"ATA", "ATAPI"}[ide_devices[i].Type], vd.DriveName);
         }
 }
 
@@ -491,7 +490,7 @@ void ide_wait_irq() {
     ide_irq_invoked = 0;
 }
 
-void ide_irq() {
+void ide_irq(registers_t *reg) {
     ide_irq_invoked = 1;
 }
 

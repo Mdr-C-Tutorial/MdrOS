@@ -100,11 +100,8 @@ static struct vfs_callback callbacks = {
 void devfs_regist() {
     devfs_id = vfs_regist("devfs", &callbacks);
     vfs_mkdir("/dev");
-    vfs_mkdir("/dev/mnt");
-    device_fs_node = vfs_open("/dev/mnt");
+    device_fs_node = vfs_open("/dev");
     vfs_mount(NULL, device_fs_node);
-
-    devfs_sysinfo_init();
 
     klogf(true,"Device File System initialize.\n");
 }

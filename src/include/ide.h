@@ -74,6 +74,7 @@
 #define ATA_WRITE 0x01
 
 #include "ctypes.h"
+#include "isr.h"
 
 struct IDEHardDiskInfomationBlock {
     char reserve1[2];
@@ -105,7 +106,7 @@ unsigned char ide_ata_access(unsigned char direction, unsigned char drive,
                              unsigned int lba, unsigned char numsects,
                              unsigned short selector, unsigned int edi);
 void ide_wait_irq();
-void ide_irq();
+void ide_irq(registers_t *reg);
 unsigned char ide_atapi_read(unsigned char drive, unsigned int lba,
                              unsigned char numsects, unsigned short selector,
                              unsigned int edi);

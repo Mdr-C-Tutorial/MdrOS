@@ -21,7 +21,7 @@
 
 extern void* program_break_end;
 
-int test_proc() {
+int test_proc(void* arg) {
     while(1) printk("%c\n",kernel_getch());
     return -1;
 }

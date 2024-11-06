@@ -23,8 +23,6 @@ target("kernel")
 
     add_ldflags("-T", "linker.ld", {force = true})
     add_cflags("-m32", "-mno-80387", "-mno-mmx", "-mno-sse", "-mno-sse2", {force = true})
-    add_cflags("-Wno-macro-redefined", "-Wno-int-conversion", {force = true})
-    add_cflags("-Wno-incompatible-pointer-types", {force = true})
 
 target("iso")
     set_kind("phony")

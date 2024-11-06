@@ -5,7 +5,7 @@
 
 extern page_directory_t *kernel_directory; //page.c
 
-void *program_break = 0x3e0000;
+void *program_break = (void*)0x3e0000;
 void *program_break_end;
 
 void *sbrk(int incr) { //内核堆扩容措施
