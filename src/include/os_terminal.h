@@ -6,20 +6,43 @@
 #include "kmalloc.h"
 #include "klog.h"
 
-bool terminal_init(unsigned int width,
-                    unsigned int height,
-                    uint32_t *screen,
-                    void *(*malloc)(uintptr_t),
-                    void (*free)(void*),
-                    void (*serial_print)(const char*));
+typedef struct TerminalPalette {
+  uint32_t foreground;
+  uint32_t background;
+  uint32_t ansi_colors[16];
+} TerminalPalette;
+
+#define TERMINAL_EMBEDDED_FONT
+
+
+bool terminal_init(size_t width,
+                   size_t height,
+                   uint32_t *screen,
+                   float font_size,
+                   void *(*malloc)(size_t),
+                   void (*free)(void*),
+                   void (*serial_print)(const char*));
+
+
 void terminal_destroy(void);
+
 void terminal_flush(void);
-void terminal_set_auto_flush(unsigned int auto_flush);
+
+void terminal_set_auto_flush(size_t auto_flush);
+
 void terminal_advance_state(const char *s);
+
 void terminal_advance_state_single(char c);
-const char *terminal_handle_keyboard(unsigned char scancode);
+
+void terminal_set_color_scheme(size_t palette_index);
+
+void terminal_set_custom_color_scheme(struct TerminalPalette palette);
+
+bool terminal_handle_keyboard(uint8_t scancode, char *buffer);
+
 
 static inline void terminal_setup(){
     extern uint32_t tty_status; tty_status = TTY_OST_OUTPUT;
-    terminal_init(get_vbe_width(), get_vbe_height(), get_vbe_screen(), kmalloc, kfree, logk);
+    terminal_init(get_vbe_width(), get_vbe_height(), get_vbe_screen(), 12.0, kmalloc, kfree, logk);
+    terminal_set_auto_flush(0);
 }

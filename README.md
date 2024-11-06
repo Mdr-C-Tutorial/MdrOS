@@ -13,7 +13,7 @@ Project struct document [Project docs](docs/README.md)
 ## Build
 
 * Install `xmake` and `nasm`
-* Type `xmake build qemu`
+* Type `xmake run`
 
 ## Contributing
 

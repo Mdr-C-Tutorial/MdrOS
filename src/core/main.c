@@ -21,9 +21,11 @@
 
 extern void* program_break_end;
 
-int test_proc(void* arg) {
-    while(1) printk("%c\n",kernel_getch());
-    return -1;
+int terminal_manual_flush(void* arg) {
+	while (1) {
+		terminal_flush();
+        __asm__ __volatile__("hlt");
+	}
 }
 
 /*
@@ -65,11 +67,11 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     init_pcb();
 
     keyboard_init();
-    create_kernel_thread(test_proc, NULL, "Test");
+    create_kernel_thread(terminal_manual_flush, NULL, "Terminal manual flush");
 
     klogf(true,"Kernel load done!\n");
     enable_scheduler();
-    io_sti(); //内核加载完毕, 打开中断以启动进程调度器, 开始运行
+    io_sti(); //内核加载完毕, 打开中断以启动进程调度器, 开始运行int i = 0;
 
     // int ret = vfs_mkdir("/dev");
     // printk(" vfs  ret=%d\n",ret);
