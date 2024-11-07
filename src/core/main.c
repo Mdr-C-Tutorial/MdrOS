@@ -17,14 +17,9 @@
 #include "keyboard.h"
 #include "scheduler.h"
 #include "krlibc.h"
-#include "pipfs.h"
+#include "shell.h"
 
 extern void* program_break_end;
-
-int test_proc(void* arg) {
-    while(1) printk("%c\n",kernel_getch());
-    return -1;
-}
 
 /*
  * 内核初始化函数, 最终会演变为CPU0的IDLE进程
@@ -65,7 +60,8 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     init_pcb();
 
     keyboard_init();
-    create_kernel_thread(test_proc, NULL, "Test");
+    create_kernel_thread((void*)setup_shell, NULL, "Shell");
+    klogf(true,"Enable kernel shell service.\n");
 
     klogf(true,"Kernel load done!\n");
     enable_scheduler();

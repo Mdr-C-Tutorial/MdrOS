@@ -6,7 +6,6 @@
 #include "krlibc.h"
 #include "io.h"
 #include "description_table.h"
-#include "devfs.h"
 
 extern pcb_t *current_pcb;
 extern pcb_t *running_proc_head;
@@ -23,6 +22,7 @@ static void add_task(pcb_t *new_task){ //添加进程至调度链
     if(new_task == NULL) return;
     pcb_t *tailt = running_proc_head;
     while (tailt->next != running_proc_head) {
+        if(tailt->next == NULL) break;
         tailt = tailt->next;
     }
     tailt->next = new_task;
@@ -148,7 +148,6 @@ void kill_proc(pcb_t *pcb){
         if (head->pid == pcb->pid) {
             last->next = pcb->next;
             kfree(pcb);
-            update_pipfs();
             io_sti();
             return;
         }
