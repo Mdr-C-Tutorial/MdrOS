@@ -2,7 +2,7 @@
 
 #include "vfs.h"
 
-int devfs_mount(char* src, vfs_node_t node);
+int devfs_mount(const char* src, vfs_node_t node);
 void devfs_regist();
 int dev_get_sector_size(char *path);
 int dev_get_size(char *path);

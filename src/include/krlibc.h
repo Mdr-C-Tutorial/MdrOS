@@ -20,6 +20,11 @@
    (((x) & 0x0000ff00) << 8) | (((x) & 0x000000ff) << 24))
 #define swap16(x) ((((x) & 0xff00) >> 8) | (((x) & 0x00ff) << 8))
 
+#define waitif(cond)                                                                               \
+  ((void)({                                                                                        \
+    while (cond) {}                                                                                \
+  }))
+
 #include "ctypes.h"
 #include <stdarg.h>
 

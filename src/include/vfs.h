@@ -10,10 +10,10 @@
 
 typedef struct vfs_node *vfs_node_t;
 
-typedef int (*vfs_mount_t)(char* src, vfs_node_t node);
+typedef int (*vfs_mount_t)(const char* src, vfs_node_t node);
 typedef void (*vfs_unmount_t)(void *root);
 
-typedef void (*vfs_open_t)(void *parent, char* name, vfs_node_t node);
+typedef void (*vfs_open_t)(void *parent,const char* name, vfs_node_t node);
 typedef void (*vfs_close_t)(void *current);
 typedef void (*vfs_resize_t)(void *current, uint64_t size);
 
@@ -24,7 +24,7 @@ typedef int (*vfs_read_t)(void *file, void *addr, size_t offset, size_t size);
 typedef int (*vfs_stat_t)(void *file, vfs_node_t node);
 
 // 创建一个文件或文件夹
-typedef int (*vfs_mk_t)(void *parent, char* name, vfs_node_t node);
+typedef int (*vfs_mk_t)(void *parent,const char* name, vfs_node_t node);
 
 // 映射文件从 offset 开始的 size 大小
 typedef void *(*vfs_mapfile_t)(void *file, size_t offset, size_t size);
@@ -77,19 +77,19 @@ struct fd {
 extern struct vfs_callback vfs_empty_callback;
 extern vfs_node_t rootdir;
 
-int vfs_mkdir(char* name);
-int vfs_mkfile(char* name);
-int vfs_regist(char* name, vfs_callback_t callback);
-vfs_node_t vfs_child_append(vfs_node_t parent, char* name, void *handle);
-vfs_node_t vfs_node_alloc(vfs_node_t parent, char* name);
+int vfs_mkdir(const char* name);
+int vfs_mkfile(const char* name);
+int vfs_regist(const char* name, vfs_callback_t callback);
+vfs_node_t vfs_child_append(vfs_node_t parent, const char* name, void *handle);
+vfs_node_t vfs_node_alloc(vfs_node_t parent, const char* name);
 int vfs_close(vfs_node_t node);
 void vfs_free(vfs_node_t vfs);
-vfs_node_t vfs_open(char* str);
-vfs_node_t vfs_do_search(vfs_node_t dir, char* name);
+vfs_node_t vfs_open(const char* str);
+vfs_node_t vfs_do_search(vfs_node_t dir, const char* name);
 void vfs_free_child(vfs_node_t vfs);
 int vfs_read(vfs_node_t file, void *addr, size_t offset, size_t size);
 int vfs_write(vfs_node_t file, void *addr, size_t offset, size_t size);
-int vfs_mount(char* src, vfs_node_t node);
-int vfs_unmount(char* path);
+int vfs_mount(const char* src, vfs_node_t node);
+int vfs_unmount(const char* path);
 vfs_node_t get_rootdir();
 bool vfs_init();

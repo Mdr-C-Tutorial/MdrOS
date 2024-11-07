@@ -21,6 +21,8 @@
 
 extern void* program_break_end;
 
+extern void iso9660_regist(); //iso9660.c
+
 /*
  * 内核初始化函数, 最终会演变为CPU0的IDLE进程
  * > 注意, 其所有的函数调用顺序均不可改变. 需按顺序初始化OS功能
@@ -49,7 +51,7 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
            multiboot->framebuffer_addr);
     klogf(true, "Memory manager initialize.\n");
 
-    init_vdisk();
+    vdisk_init();
     vfs_init();
     init_pci(); //pci设备列表加载, 所有PCI设备相关驱动初始化需在此函数后方调用
 
@@ -57,6 +59,7 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
 
     devfs_regist();
     io_cli(); //ide驱动会打开中断以加载硬盘设备, 需重新关闭中断以继续初始化其余OS功能
+    iso9660_regist();
     init_pcb();
 
     keyboard_init();

@@ -3,6 +3,7 @@
 #include "klog.h"
 #include "keyboard.h"
 #include "cmos.h"
+#include "vfs.h"
 
 static inline int isprint_syshell(int c) {
     return (c > 0x1F && c < 0x7F);
@@ -17,7 +18,7 @@ static char getc() {
     return c;
 }
 
-int gets(char *buf, int buf_size) {
+static int gets(char *buf, int buf_size) {
     int index = 0;
     char c;
     while ((c = getc()) != '\n') {
@@ -36,7 +37,7 @@ int gets(char *buf, int buf_size) {
     return index;
 }
 
-int cmd_parse(char *cmd_str, char **argv, char token) {
+static int cmd_parse(char *cmd_str, char **argv, char token) {
     int arg_idx = 0;
     while (arg_idx < MAX_ARG_NR) {
         argv[arg_idx] = NULL;
@@ -56,6 +57,54 @@ int cmd_parse(char *cmd_str, char **argv, char token) {
     }
 
     return argc;
+}
+
+static void mkdir(int argc,char** argv){
+    if (argc == 1) {
+        printk("[Shell-MKDIR]: If there are too few parameters.\n");
+        return;
+    }
+    if(vfs_mkdir(argv[1]) == -1){
+        printk("Failed create directory [%s].\n",argv[1]);
+    }
+}
+
+static void mount(int argc,char** argv){
+    if (argc == 2) {
+        printk("[Shell-MOUNT]: If there are too few parameters.\n");
+        return;
+    }
+    vfs_node_t p = vfs_open(argv[1]);
+    if(p == NULL) {
+        printk("Cannot found mount directory.\n");
+        return;
+    }
+    if(vfs_mount(argv[2],p) == -1){
+        printk("Failed mount device [%s]\n",argv[2]);
+    }
+}
+
+static void ls(int argc,char** argv){
+    vfs_node_t p;
+    if (argc == 1) {
+        p = vfs_open("/");
+    } else{
+        p = vfs_open(argv[1]);
+    }
+    if(p == NULL) printk("Cannot fount directory.\n");
+    list_foreach(p->child, i) {
+        vfs_node_t c = (vfs_node_t) i->data;
+        printk("%s ", c->name);
+    }
+    printk("\n");
+}
+
+static void print_help(){
+    printk("Usage <command> [argument...]\n");
+    printk("help h ?                 Get shell command help.\n");
+    printk("mkdir     <name>         Make a directory to vfs.\n");
+    printk("mount     <dir> <dev>    Mount a file system to vfs directory.\n");
+    printk("ls        [path]         List all file or directory.\n");
 }
 
 void setup_shell(){
@@ -85,6 +134,14 @@ void setup_shell(){
             continue;
         }
 
-
+        if (!strcmp("help", argv[0]) || !strcmp("?", argv[0]) || !strcmp("h", argv[0])) {
+            print_help();
+        } else if(!strcmp("mkdir",argv[0]))
+            mkdir(argc,argv);
+        else if(!strcmp("ls",argv[0]))
+            ls(argc,argv);
+        else if(!strcmp("mount",argv[0]))
+            mount(argc,argv);
+        else printk("\033[31m[Shell]: Unknown command '%s'.\033[39m\n", argv[0]);
     }
 }
