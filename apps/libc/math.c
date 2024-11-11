@@ -3,60 +3,47 @@
 #define EPS (2.22044604925031308085e-16)
 static const float toint = 1 / EPS;
 
-static const double ivln10hi =
-        4.34294481878168880939e-01, /* 0x3fdbcb7b, 0x15200000 */
-ivln10lo = 2.50829467116452752298e-11,          /* 0x3dbb9438, 0xca9aadd5 */
-log10_2hi = 3.01029995663611771306e-01,         /* 0x3FD34413, 0x509F6000 */
-log10_2lo = 3.69423907715893078616e-13,         /* 0x3D59FEF3, 0x11F12B36 */
-Lg1 = 6.666666666666735130e-01,                 /* 3FE55555 55555593 */
-Lg2 = 3.999999999940941908e-01,                 /* 3FD99999 9997FA04 */
-Lg3 = 2.857142874366239149e-01,                 /* 3FD24924 94229359 */
-Lg4 = 2.222219843214978396e-01,                 /* 3FCC71C5 1D8E78AF */
-Lg5 = 1.818357216161805012e-01,                 /* 3FC74664 96CB03DE */
-Lg6 = 1.531383769920937332e-01,                 /* 3FC39A09 D078C69F */
-Lg7 = 1.479819860511658591e-01;                 /* 3FC2F112 DF3E5244 */
+static const double \
+    ivln10hi = 4.34294481878168880939e-01,          /* 0x3fdbcb7b, 0x15200000 */
+    ivln10lo = 2.50829467116452752298e-11,          /* 0x3dbb9438, 0xca9aadd5 */
+    log10_2hi = 3.01029995663611771306e-01,         /* 0x3FD34413, 0x509F6000 */
+    log10_2lo = 3.69423907715893078616e-13,         /* 0x3D59FEF3, 0x11F12B36 */
+    Lg1 = 6.666666666666735130e-01,                 /* 3FE55555 55555593 */
+    Lg2 = 3.999999999940941908e-01,                 /* 3FD99999 9997FA04 */
+    Lg3 = 2.857142874366239149e-01,                 /* 3FD24924 94229359 */
+    Lg4 = 2.222219843214978396e-01,                 /* 3FCC71C5 1D8E78AF */
+    Lg5 = 1.818357216161805012e-01,                 /* 3FC74664 96CB03DE */
+    Lg6 = 1.531383769920937332e-01,                 /* 3FC39A09 D078C69F */
+    Lg7 = 1.479819860511658591e-01;                 /* 3FC2F112 DF3E5244 */
 
-#define FORCE_EVAL(x) do {									\
-	if (sizeof(x) == sizeof(float)) {						\
-		volatile float __x __attribute__((unused));			\
-		__x = (x);											\
-	} else if (sizeof(x) == sizeof(double)) {				\
-		volatile double __x __attribute__((unused));		\
-		__x = (x);											\
-	} else {												\
-		volatile long double __x __attribute__((unused));	\
-		__x = (x);											\
-	}														\
-} while(0)
+#define FORCE_EVAL(x)                                                          \
+    do {                                                                       \
+        if (sizeof(x) == sizeof(float)) {                                      \
+            volatile float __x __attribute__((unused));                        \
+            __x = (x);                                                         \
+        } else if (sizeof(x) == sizeof(double)) {                              \
+            volatile double __x __attribute__((unused));                       \
+            __x = (x);                                                         \
+        } else {                                                               \
+            volatile long double __x __attribute__((unused));                  \
+            __x = (x);                                                         \
+        }                                                                      \
+    } while (0)
 
-#define sub_ddmmss(sh, sl, ah, al, bh, bl) \
-  __asm__ ("subl %5,%1\n\tsbbl %3,%0"                    \
-       : "=r" ((USItype) (sh)),                    \
-         "=&r" ((USItype) (sl))                    \
-       : "0" ((USItype) (ah)),                    \
-         "g" ((USItype) (bh)),                    \
-         "1" ((USItype) (al)),                    \
-         "g" ((USItype) (bl)))
-#define umul_ppmm(w1, w0, u, v) \
-  __asm__ ("mull %3"                            \
-       : "=a" ((USItype) (w0)),                    \
-         "=d" ((USItype) (w1))                    \
-       : "%0" ((USItype) (u)),                    \
-         "rm" ((USItype) (v)))
-#define udiv_qrnnd(q, r, n1, n0, dv) \
-  __asm__ ("divl %4"                            \
-       : "=a" ((USItype) (q)),                    \
-         "=d" ((USItype) (r))                    \
-       : "0" ((USItype) (n0)),                    \
-         "1" ((USItype) (n1)),                    \
-         "rm" ((USItype) (dv)))
-#define count_leading_zeros(count, x) \
-  do {                                    \
-    USItype __cbtmp;                            \
-    __asm__ ("bsrl %1,%0"                        \
-         : "=r" (__cbtmp) : "rm" ((USItype) (x)));            \
-    (count) = __cbtmp ^ 31;                        \
-  } while (0)
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)                                     \
+    __asm__("subl %5,%1\n\tsbbl %3,%0"                                         \
+            : "=r"((sh)), "=&r"((sl))                                          \
+            : "0"((ah)), "g"((bh)), "1"((al)), "g"((bl)))
+#define umul_ppmm(w1, w0, u, v)                                                \
+    __asm__("mull %3" : "=a"((w0)), "=d"((w1)) : "%0"((u)), "rm"((v)))
+#define udiv_qrnnd(q, r, n1, n0, dv)                                           \
+    __asm__("divl %4" : "=a"((q)), "=d"((r)) : "0"((n0)), "1"((n1)), "rm"((dv)))
+#define count_leading_zeros(count, x)                                          \
+    do {                                                                       \
+        USItype __cbtmp;                                                       \
+        __asm__("bsrl %1,%0" : "=r"(__cbtmp) : "rm"((x)));                     \
+        (count) = __cbtmp ^ 31;                                                \
+    } while (0)
 
 static unsigned rand_seed = 1;
 static unsigned short max_bit = 32;
@@ -93,7 +80,7 @@ static UDWtype __udivmoddi4(UDWtype n, UDWtype d, UDWtype *rp) {
             /* qq = NN / 0d */
 
             if (d0 == 0)
-                d0 = 1 / d0;    /* Divide intentionally by zero.  */
+                d0 = 1 / d0; /* Divide intentionally by zero.  */
 
             udiv_qrnnd(q1, n1, 0, n1, d0);
             udiv_qrnnd(q0, n0, n1, n0, d0);
@@ -108,79 +95,70 @@ static UDWtype __udivmoddi4(UDWtype n, UDWtype d, UDWtype *rp) {
         }
     }
 
-#else /* UDIV_NEEDS_NORMALIZATION */
+#else  /* UDIV_NEEDS_NORMALIZATION */
 
-        if (d1 == 0)
-    {
-      if (d0 > n1)
-    {
-      /* 0q = nn / 0D */
+    if (d1 == 0) {
+        if (d0 > n1) {
+            /* 0q = nn / 0D */
 
-      count_leading_zeros (bm, d0);
+            count_leading_zeros(bm, d0);
 
-      if (bm != 0)
-        {
-          /* Normalize, i.e. make the most significant bit of the
-         denominator set.  */
+            if (bm != 0) {
+                /* Normalize, i.e. make the most significant bit of the
+               denominator set.  */
 
-          d0 = d0 << bm;
-          n1 = (n1 << bm) | (n0 >> (W_TYPE_SIZE - bm));
-          n0 = n0 << bm;
+                d0 = d0 << bm;
+                n1 = (n1 << bm) | (n0 >> (W_TYPE_SIZE - bm));
+                n0 = n0 << bm;
+            }
+
+            udiv_qrnnd(q0, n0, n1, n0, d0);
+            q1 = 0;
+
+            /* Remainder in n0 >> bm.  */
+        } else {
+            /* qq = NN / 0d */
+
+            if (d0 == 0)
+                d0 = 1 / d0; /* Divide intentionally by zero.  */
+
+            count_leading_zeros(bm, d0);
+
+            if (bm == 0) {
+                /* From (n1 >= d0) /\ (the most significant bit of d0 is set),
+               conclude (the most significant bit of n1 is set) /\ (the
+               leading quotient digit q1 = 1).
+
+               This special case is necessary, not an optimization.
+               (Shifts counts of W_TYPE_SIZE are undefined.)  */
+
+                n1 -= d0;
+                q1 = 1;
+            } else {
+                /* Normalize.  */
+
+                b = W_TYPE_SIZE - bm;
+
+                d0 = d0 << bm;
+                n2 = n1 >> b;
+                n1 = (n1 << bm) | (n0 >> b);
+                n0 = n0 << bm;
+
+                udiv_qrnnd(q1, n1, n2, n1, d0);
+            }
+
+            /* n1 != d0...  */
+
+            udiv_qrnnd(q0, n0, n1, n0, d0);
+
+            /* Remainder in n0 >> bm.  */
         }
 
-      udiv_qrnnd (q0, n0, n1, n0, d0);
-      q1 = 0;
-
-      /* Remainder in n0 >> bm.  */
-    }
-      else
-    {
-      /* qq = NN / 0d */
-
-      if (d0 == 0)
-        d0 = 1 / d0;	/* Divide intentionally by zero.  */
-
-      count_leading_zeros (bm, d0);
-
-      if (bm == 0)
-        {
-          /* From (n1 >= d0) /\ (the most significant bit of d0 is set),
-         conclude (the most significant bit of n1 is set) /\ (the
-         leading quotient digit q1 = 1).
-
-         This special case is necessary, not an optimization.
-         (Shifts counts of W_TYPE_SIZE are undefined.)  */
-
-          n1 -= d0;
-          q1 = 1;
+        if (rp != 0) {
+            rr.s.low = n0 >> bm;
+            rr.s.high = 0;
+            *rp = rr.ll;
         }
-      else
-        {
-          /* Normalize.  */
-
-          b = W_TYPE_SIZE - bm;
-
-          d0 = d0 << bm;
-          n2 = n1 >> b;
-          n1 = (n1 << bm) | (n0 >> b);
-          n0 = n0 << bm;
-
-          udiv_qrnnd (q1, n1, n2, n1, d0);
-        }
-
-      /* n1 != d0...  */
-
-      udiv_qrnnd (q0, n0, n1, n0, d0);
-
-      /* Remainder in n0 >> bm.  */
-    }
-
-      if (rp != 0)
-    {
-      rr.s.low = n0 >> bm;
-      rr.s.high = 0;
-      *rp = rr.ll;
-    }
     }
 #endif /* UDIV_NEEDS_NORMALIZATION */
 
@@ -271,14 +249,14 @@ __attribute__((used)) long long __moddi3(long long u, long long v) {
 
     if (uu.s.high < 0) {
         c = ~c;
-        uu.ll = __negdi2 (uu.ll);
+        uu.ll = __negdi2(uu.ll);
     }
     if (vv.s.high < 0)
-        vv.ll = __negdi2 (vv.ll);
+        vv.ll = __negdi2(vv.ll);
 
-    __udivmoddi4(uu.ll, vv.ll, (UDWtype *) &w);
+    __udivmoddi4(uu.ll, vv.ll, (UDWtype *)&w);
     if (c)
-        w = __negdi2 (w);
+        w = __negdi2(w);
     return w;
 }
 
@@ -289,12 +267,11 @@ int rand() {
     return (rand_seed >>= max_bit);
 }
 
-void srand(unsigned seed) {
-    rand_seed = seed;
-}
+void srand(unsigned seed) { rand_seed = seed; }
 
 void smax(unsigned short max_b) {
-    max_b = (sizeof(unsigned long long) * 8) - (max_b % (sizeof(unsigned long long) * 8));
+    max_b = (sizeof(unsigned long long) * 8) -
+            (max_b % (sizeof(unsigned long long) * 8));
     max_bit = (max_b == 0) ? (sizeof(unsigned long long) * 8 / 2) : (max_b);
 }
 
@@ -303,60 +280,62 @@ void srandlevel(unsigned short randlevel_) {
         randlevel = randlevel_;
 }
 
-int32_t abs(int32_t x) {
-    return (x < 0) ? (-x) : (x);
-}
+int32_t abs(int32_t x) { return (x < 0) ? (-x) : (x); }
 
 double pow(double a, long long b) {
     char t = 0;
-    if (b < 0)b = -b, t = 1;
+    if (b < 0)
+        b = -b, t = 1;
     double ans = 1;
     while (b) {
-        if (b & 1)ans *= a;
+        if (b & 1)
+            ans *= a;
         a *= a;
         b >>= 1;
     }
-    if (t)return (1.0 / ans);
-    else return ans;
+    if (t)
+        return (1.0 / ans);
+    else
+        return ans;
 }
 
-//快速整数平方
+// 快速整数平方
 unsigned long long ull_pow(unsigned long long a, unsigned long long b) {
     unsigned long long ans = 1;
     while (b) {
-        if (b & 1)ans *= a;
+        if (b & 1)
+            ans *= a;
         a *= a;
         b >>= 1;
     }
     return ans;
 }
 
-
 double sqrt(double x) {
-    if (x == 0)return 0.0;
+    if (x == 0)
+        return 0.0;
     double xk = 1.0, xk1 = 0.0;
-    while (xk != xk1)xk1 = xk, xk = (xk + x / xk) / 2.0;
+    while (xk != xk1)
+        xk1 = xk, xk = (xk + x / xk) / 2.0;
     return xk;
 }
 
-//快速求算数平方根（速度快，精度低）
+// 快速求算数平方根（速度快，精度低）
 float q_sqrt(float number) {
     long i;
     float x, y;
     const float f = 1.5F;
     x = number * 0.5F;
     y = number;
-    i = *(long *) (&y);
+    i = *(long *)(&y);
     i = 0x5f3759df - (i >> 1);
-    y = *(float *) (&i);
+    y = *(float *)(&i);
     y = y * (f - (x * y * y));
     y = y * (f - (x * y * y));
     return number * y;
 }
 
-double mod(double x, double y) {
-    return x - (int32_t)(x / y) * y;
-}
+double mod(double x, double y) { return x - (int32_t)(x / y) * y; }
 
 double sin(double x) {
     x = mod(x, 2 * PI);
@@ -388,9 +367,7 @@ double cos(double x) {
     return sum;
 }
 
-double tan(double x) {
-    return sin(x) / cos(x);
-}
+double tan(double x) { return sin(x) / cos(x); }
 
 double asin(double x) {
     double sum = x;
@@ -404,9 +381,7 @@ double asin(double x) {
     return sum;
 }
 
-double acos(double x) {
-    return PI / 2 - asin(x);
-}
+double acos(double x) { return PI / 2 - asin(x); }
 
 double atan(double x) {
     double sum = x;
@@ -423,11 +398,16 @@ double atan(double x) {
 }
 
 double atan2(double y, double x) {
-    if (x > 0) return atan(y / x);
-    if (x < 0 && y >= 0) return atan(y / x) + PI;
-    if (x < 0 && y < 0) return atan(y / x) - PI;
-    if (x == 0 && y > 0) return PI / 2;
-    if (x == 0 && y < 0) return -PI / 2;
+    if (x > 0)
+        return atan(y / x);
+    if (x < 0 && y >= 0)
+        return atan(y / x) + PI;
+    if (x < 0 && y < 0)
+        return atan(y / x) - PI;
+    if (x == 0 && y > 0)
+        return PI / 2;
+    if (x == 0 && y < 0)
+        return -PI / 2;
     return 0;
 }
 
@@ -455,7 +435,7 @@ double modf(double x, double *iptr) {
         uint64_t i;
     } u = {x};
     uint64_t mask;
-    int e = (int) (u.i >> 52 & 0x7ff) - 0x3ff;
+    int e = (int)(u.i >> 52 & 0x7ff) - 0x3ff;
 
     /* no fractional part */
     if (e >= 52) {
@@ -523,15 +503,15 @@ long long __divdi3(long long u, long long v) {
 
     if (uu.s.high < 0) {
         c = ~c;
-        uu.ll = __negdi2 (uu.ll);
+        uu.ll = __negdi2(uu.ll);
     }
     if (vv.s.high < 0) {
         c = ~c;
-        vv.ll = __negdi2 (vv.ll);
+        vv.ll = __negdi2(vv.ll);
     }
-    w = __udivmoddi4(uu.ll, vv.ll, (UDWtype *) 0);
+    w = __udivmoddi4(uu.ll, vv.ll, (UDWtype *)0);
     if (c)
-        w = __negdi2 (w);
+        w = __negdi2(w);
     return w;
 }
 
@@ -712,7 +692,6 @@ double exp(double x) {
     x *= x;
 
     return x;
-
 }
 
 double log10(double x) {
@@ -743,9 +722,9 @@ double log10(double x) {
 
     /* reduce x into [sqrt(2)/2, sqrt(2)] */
     hx += 0x3ff00000 - 0x3fe6a09e;
-    k += (int) (hx >> 20) - 0x3ff;
+    k += (int)(hx >> 20) - 0x3ff;
     hx = (hx & 0x000fffff) + 0x3fe6a09e;
-    u.i = (uint64_t) hx << 32 | (u.i & 0xffffffff);
+    u.i = (uint64_t)hx << 32 | (u.i & 0xffffffff);
     x = u.f;
 
     f = x - 1.0;
@@ -761,7 +740,7 @@ double log10(double x) {
     /* hi+lo = f - hfsq + s*(hfsq+R) ~ log(1+f) */
     hi = f - hfsq;
     u.f = hi;
-    u.i &= (uint64_t) - 1 << 32;
+    u.i &= (uint64_t)-1 << 32;
     hi = u.f;
     lo = f - hi - hfsq + s * (hfsq + R);
 
@@ -787,14 +766,14 @@ double log10(double x) {
 double log2(float x) {
     long *a;
     double o;
-    a = (long *) &x;
-    o = (double) *a;
+    a = (long *)&x;
+    o = (double)*a;
     o = o / POW223 - 126.928071372;
     return o;
 }
 
 double log(double a) {
-    int N = 15;//我们取了前15+1项来估算
+    int N = 15; // 我们取了前15+1项来估算
     int k, nk;
     double x, xx, y;
     x = (a - 1) / (a + 1);
@@ -804,10 +783,8 @@ double log(double a) {
     for (k = N; k > 0; k--) {
         nk = nk - 2;
         y = 1.0 / nk + xx * y;
-
     }
     return 2.0 * x * y;
-
 }
 
 float roundf(float x) {
@@ -839,7 +816,7 @@ float roundf(float x) {
 }
 
 unsigned long long __udivdi3(unsigned long long u, unsigned long long v) {
-    return __udivmoddi4(u, v, (UDWtype *) 0);
+    return __udivmoddi4(u, v, (UDWtype *)0);
 }
 
 unsigned long long __umoddi3(unsigned long long u, unsigned long long v) {

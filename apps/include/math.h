@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define MIN(i, j) (((i) < (j)) ? (i) : (j))
 #define MAX(i, j) (((i) > (j)) ? (i) : (j))
 
@@ -14,11 +13,11 @@
 
 #define PHI 1.61803398874989484820458683436563811772030917980576
 
-#define NAN                        __builtin_nan("")
+#define NAN                     __builtin_nan("")
 #define INFINITY                __builtin_inf()
-#define    HUGE_VALF                __builtin_huge_valf()
-#define    HUGE_VAL                __builtin_huge_val()
-#define    HUGE_VALL                __builtin_huge_vall()
+#define HUGE_VALF               __builtin_huge_valf()
+#define HUGE_VAL                __builtin_huge_val()
+#define HUGE_VALL               __builtin_huge_vall()
 
 #define INT_MAX 2147483647
 #define INT_MIN -2147483648

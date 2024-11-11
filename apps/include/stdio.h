@@ -1,10 +1,8 @@
 #pragma once
 
-#include <stdint.h>
-#include <stdarg.h>
-#include <stddef.h>
+#include "ctype.h"
 
-int printf(char *format,...);
+int printf(const char *format,...);
 int putchar(char c);
 int puts(char *string);
 int vsnprintf(char *buf, size_t n, const char *fmt, va_list ap);

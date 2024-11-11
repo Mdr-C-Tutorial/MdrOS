@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stddef.h>
 #include "ctype.h"
 
 void exit(int retval);
@@ -18,6 +17,4 @@ static inline int atoi(const char **s) {
     return i;
 }
 
-static inline void abort(void){
-    exit(-1);
-}
+static inline void abort(void) { exit(-1); }

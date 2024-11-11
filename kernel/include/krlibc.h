@@ -11,9 +11,6 @@
 #define LONG_MAX 9223372036854775807L
 #define LONG_MIN (-9223372036854775808L)
 
-#define UINT32_MAX 0xffffffff
-#define INT32_MAX 0x7fffffff
-
 #define PADDING_DOWN(size, to) ((size_t)(size) / (size_t)(to) * (size_t)(to))
 #define PADDING_UP(size, to)   PADDING_DOWN((size_t)(size) + (size_t)(to) - (size_t)1, to)
 
