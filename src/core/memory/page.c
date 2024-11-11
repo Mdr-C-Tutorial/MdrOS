@@ -169,8 +169,13 @@ page_directory_t *clone_directory(page_directory_t *src) {
     return dir;
 }
 
+page_directory_t *get_current_directory(){
+    return current_directory;
+}
+
 void page_fault(registers_t *regs) {
     io_cli();
+    disable_scheduler();
     uint32_t faulting_address;
     __asm__ volatile("mov %%cr2, %0" : "=r" (faulting_address)); //
 
@@ -180,32 +185,35 @@ void page_fault(registers_t *regs) {
     int reserved = regs->err_code & 0x8; // 写入CPU保留位
     int id = regs->err_code & 0x10; // 由取指引起
 
-    printk("[ERROR]: Page fault |");
+    printk("[ERROR]: Page fault [PID: %d |Level: %d] |",get_current_proc()->pid,get_current_proc()->task_level);
     if (present) {
-        printk("Type: present;\n\taddress: %x  \n", faulting_address);
+        printk("Type: present | address: %x  \n", faulting_address);
     } else if (rw) {
-        printk("Type: read-only;\n\taddress: %x\n", faulting_address);
+        printk("Type: read-only | address: %x\n", faulting_address);
     } else if (us) {
-        printk("Type: user-mode;\n\taddres: %x\n", faulting_address);
+        printk("Type: user-mode | addres: %x\n", faulting_address);
     } else if (reserved) {
-        printk("Type: reserved;\n\taddress: %x\n", faulting_address);
+        printk("Type: reserved | address: %x\n", faulting_address);
     } else if (id) {
-        printk("Type: decode address;\n\taddress: %x\n", faulting_address);
+        printk("Type: decode address | address: %x\n", faulting_address);
     }
 
     // 多进程相关, 未实现多进程的OS可将以下代码全部替换为 while(1)
-
     if(get_current_proc()->task_level == TASK_KERNEL_LEVEL){
         klogf(false,"Kernel Error Panic.\n");
         while (1) io_hlt();
     } else if(get_current_proc()->task_level == TASK_APPLICATION_LEVEL){
         kill_proc(get_current_proc());
-        while (1) io_hlt();
     } else if(get_current_proc()->task_level == TASK_SYSTEM_SERVICE_LEVEL){
         //TODO 蓝屏处理程序待实现
         klogf(false,"System service error. ==Kernel Panic==\n");
         while (1) io_hlt();
     }
+
+
+
+    enable_scheduler();
+    io_sti();
 }
 
 void page_init(multiboot_t *multiboot){

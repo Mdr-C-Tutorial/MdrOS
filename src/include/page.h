@@ -32,6 +32,8 @@ typedef struct page_directory {
     uint32_t physicalAddr;
 }__attribute__((packed)) page_directory_t;
 
+page_directory_t *get_current_directory();
+page_directory_t *clone_directory(page_directory_t *src);
 void alloc_frame_line(page_t *page, uint32_t line,int is_kernel, int is_writable);
 void alloc_frame(page_t *page, int is_kernel, int is_writable);
 void free_frame(page_t *page);

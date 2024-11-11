@@ -3,18 +3,22 @@ set_project("MdrOS")
 add_rules("mode.debug", "mode.release")
 add_requires("zig", "nasm")
 
+set_arch("i386")
 set_optimize("fastest")
 set_warnings("all", "extra")
+set_policy("run.autobuild", true)
 
 target("kernel")
     set_kind("binary")
     set_languages("c23")
     set_toolchains("@zig", "nasm")
+    set_default(false)
 
     add_linkdirs("lib")
     add_includedirs("src/include")
 
     add_links("os_terminal")
+    add_links("elf_parse")
     add_files("src/**/*.asm", "src/**/*.c")
 
     add_asflags("-f", "elf32", {force = true})
@@ -22,7 +26,7 @@ target("kernel")
     add_ldflags("-target x86-freestanding", {force = true})
 
     add_ldflags("-T", "linker.ld", {force = true})
-    add_cflags("-m32", "-mno-80387", "-mno-mmx", "-mno-sse", "-mno-sse2", {force = true})
+    add_cflags("-mno-80387", "-mno-mmx", "-mno-sse", "-mno-sse2", {force = true})
 
 target("iso")
     set_kind("phony")
@@ -31,7 +35,7 @@ target("iso")
 
     on_build(function (target)
         import("core.project.project")
-        local iso_dir = "$(buildir)/iso"
+        local iso_dir = "$(buildir)/iso_dir"
 
         if os.exists(iso_dir) then
             os.rmdir(iso_dir)
@@ -47,12 +51,7 @@ target("iso")
         print("ISO image created at: " .. iso_file)
     end)
 
-target("qemu")
-    set_kind("phony")
-    add_deps("iso")
-    set_default(false)
-
-    on_build(function (target)
+    on_run(function (target)
         local flags = "-device sb16 -m 4096 -no-reboot"
         os.exec("qemu-system-i386 -cdrom $(buildir)/mdros.iso %s", flags)
     end)

@@ -45,6 +45,7 @@ typedef struct task_pcb{
     uint8_t task_level;           // 进程等级< 0:内核 | 1:系统服务 | 2:应用程序 >
     int pid;
     char name[50];
+    char cmdline[50];
     void* user_stack;             //用户栈
     void* kernel_stack;           //内核栈
     void* program_break;          // 进程堆基址
@@ -54,10 +55,11 @@ typedef struct task_pcb{
     tty_t *tty;                   // TTY设备
     bool fpu_flag;				  // 是否使用 FPU
     uint32_t cpu_clock;           // CPU运行时间片
+    vfs_node_t exe_file;          // 可执行文件
     struct task_pcb *next;     // 链表指针
 }pcb_t;
 
-int create_user_proc(uint32_t _user_start,char *args,char* name);
+int create_user_process(const char* path,const char* cmdline,char* name,uint8_t level);
 int create_kernel_thread(int (*_start)(void* arg),void *args,char* name);
 void kill_proc(pcb_t *pcb); //杀死指定进程
 pcb_t *found_pcb(int pid); //根据PID获取一个进程

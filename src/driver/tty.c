@@ -46,6 +46,7 @@ tty_t* default_tty_alloc(){
 }
 
 void free_tty(tty_t *tty){
+    kfree(tty->fifo->buf);
     kfree(tty->fifo);
     kfree(tty);
 }

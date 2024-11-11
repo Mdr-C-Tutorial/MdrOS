@@ -6,6 +6,7 @@
 #include "krlibc.h"
 #include "io.h"
 #include "description_table.h"
+#include "elf_util.h"
 
 extern pcb_t *current_pcb;
 extern pcb_t *running_proc_head;
@@ -30,8 +31,8 @@ static void add_task(pcb_t *new_task){ //添加进程至调度链
 
 static void switch_to_user_mode(uint32_t func) {
     io_cli();
-    uint32_t esp = (uint32_t )current_pcb->user_stack + STACK_SIZE;
-    current_pcb->context.eflags = (0 << 12 | 0b10 | 1 << 9);
+    uint32_t esp = (uint32_t )get_current_proc()->user_stack + STACK_SIZE;
+    get_current_proc()->context.eflags = (0 << 12 | 0b10 | 1 << 9);
     intr_frame_t iframe;
     iframe.edi = 1;
     iframe.esi = 2;
@@ -68,27 +69,56 @@ _Noreturn static void process_exit(){
     while (1);
 }
 
-int create_user_proc(uint32_t _user_start,char *args,char* name){ //创建用户进程
+int create_user_process(const char* path,const char* cmdline,char* name,uint8_t level){
+    vfs_node_t exefile = vfs_open(path);
+    if(exefile == NULL) return -1;
+
+
+
     pcb_t *new_task = kmalloc(STACK_SIZE);
     memset(new_task, 0, sizeof(pcb_t));
 
-    new_task->task_level = TASK_APPLICATION_LEVEL;
+    new_task->task_level = level;
     strcpy(new_task->name,name);
+    strcpy(new_task->cmdline,cmdline);
     new_task->pid = now_pid++;
-    new_task->program_break = program_break;
-    new_task->program_break_end = program_break_end;
-    new_task->pgd_dir = kernel_directory;
+    new_task->pgd_dir = clone_directory(kernel_directory);
     new_task->cpu_clock = 0;
-    new_task->tty = &default_tty;
+    new_task->tty = default_tty_alloc();
     new_task->cpu_clock = 0;
-
+    new_task->exe_file = exefile;
     new_task->kernel_stack = new_task;
 
+    for (uint32_t i = 0xb2000000 - STACK_SIZE; i < 0xb2000000; i+= PAGE_SIZE) {
+        alloc_frame(get_page(i,1,new_task->pgd_dir),0,1);
+    }
+    new_task->user_stack = (void*)0xb2000000 - STACK_SIZE;
+
+    page_directory_t *cur_dir = get_current_proc()->pgd_dir;
+    disable_scheduler();
+    io_sti();
+    switch_page_directory(new_task->pgd_dir);
+    uint8_t *data = kmalloc(exefile->size);
+    if(vfs_read(exefile,data,0,exefile->size) == -1){
+        vfs_close(exefile);
+        return -1;
+    }
+    uint32_t _start = elf_load(exefile->size,data);
+    switch_page_directory(cur_dir);
+    io_cli();
+    enable_scheduler();
+
+    if(_start == 0){
+        free_tty(new_task->tty);
+        kfree(new_task);
+        vfs_close(exefile);
+        return -1;
+    }
+
     uint32_t *stack_top = (uint32_t * )((uint32_t) new_task + STACK_SIZE);
-    *(--stack_top) = (uint32_t) _user_start;
+    *(--stack_top) = (uint32_t) _start;
     *(--stack_top) = (uint32_t) process_exit;
     *(--stack_top) = (uint32_t) switch_to_user_mode;
-
     new_task->context.esp = (uint32_t) new_task + STACK_SIZE - sizeof(uint32_t) * 3;
     new_task->context.eflags = 0x200;
 
@@ -96,6 +126,7 @@ int create_user_proc(uint32_t _user_start,char *args,char* name){ //创建用户
     io_sti();
     return new_task->pid;
 }
+
 
 int create_kernel_thread(int (*_start)(void* arg),void *args,char* name){ //创建内核进程 (内核线程)
     io_cli();
@@ -138,6 +169,8 @@ void kill_proc(pcb_t *pcb){
 
     if(pcb->task_level == TASK_KERNEL_LEVEL){
 
+    } else{
+        vfs_close(pcb->exe_file);
     }
 
     free_tty(pcb->tty);

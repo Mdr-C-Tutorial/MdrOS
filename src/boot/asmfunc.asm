@@ -1,4 +1,7 @@
 global gdt_flush,tss_flush,idt_flush,switch_to,copy_page_physical
+global asm_syscall_handler
+
+extern syscall
 
 gdt_flush: ; void gdt_flush(uint32_t gdtr);
     mov eax, [esp + 4] ; [esp+4]按规定是第一个参数，即gdtr
@@ -84,3 +87,19 @@ copy_page_physical:
     popf                  ; Pop EFLAGS back.
     pop ebx               ; Get the original value of EBX back.
     ret
+
+asm_syscall_handler:
+    cli
+    push ds
+    push es
+    push fs
+    push gs
+    pusha
+    call syscall
+    mov dword [esp+28], eax
+    popa
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    IRETD
