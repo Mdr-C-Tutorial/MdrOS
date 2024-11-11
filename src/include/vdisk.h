@@ -14,6 +14,9 @@ typedef struct {
 void vdisk_init();
 int register_vdisk(vdisk vd);
 int logout_vdisk(int drive);
+/*
+ * 读取指定硬盘设备 (不推荐调用) 现已由devfs取代读取措施
+ */
 int rw_vdisk(int drive, uint32_t lba, uint8_t *buffer, uint32_t number, int read);
 bool have_vdisk(int drive);
 uint32_t disk_Size(int drive);

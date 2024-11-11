@@ -49,7 +49,7 @@ uint32_t read_pci(uint8_t bus, uint8_t device, uint8_t function, uint8_t registe
 base_address_register get_base_address_register(uint8_t bus, uint8_t device, uint8_t function, uint8_t bar);
 void pci_config(unsigned int bus, unsigned int f, unsigned int equipment, unsigned int adder);
 char *pci_classname(uint32_t classcode);
-pci_device_t *pci_find_class(uint32_t class_code);
+pci_device_t *pci_find_class(uint32_t class_code); //根据指定class_code寻找PCI设备 (找不到返回NULL)
 base_address_register find_bar(pci_device_t *device,uint8_t barNum);
 void load_pci_device(uint32_t BUS,uint32_t Equipment,uint32_t F);
 void init_pci();

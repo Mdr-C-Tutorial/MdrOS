@@ -154,13 +154,13 @@ struct idt_ptr_struct {
 typedef struct idt_ptr_struct idt_ptr_t;
 
 void idt_flush(uint32_t);
-void idt_use_reg(uint8_t num,uint32_t base);
+void idt_use_reg(uint8_t num,uint32_t base); // 注册用户态可触发中断 (需自行提供通用中断处理程序)
 void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags);
 void isr_handler(registers_t regs);
 void irq_handler(registers_t regs);
 void idt_install();
 
-void set_kernel_stack(uintptr_t stack);
+void set_kernel_stack(uintptr_t stack); //切换内核栈
 void gdt_flush(uint32_t gdtr); // asmfunc.asm
 void tss_flush();              // asmfunc.asm
 void gdt_set_gate(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);

@@ -25,4 +25,8 @@ Below are all the contributors to MdrOS.
 * `wenxuanjun` OS Developer
 * `Minsecrus` OS Developer
 
+### About how to contribute code
+
+about contribute [docs](docs/contribute.md)
+
 
