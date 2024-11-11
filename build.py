@@ -34,7 +34,6 @@ def get_files(directory, end):
                 file_list.append(os.path.join(root, file.split(".")[0]))
     return file_list
 
-
 def compile_c():
     for file in get_files(source_dir, "c"):
         if os.system(cc + " " + c_flags + " " + file+".c" + " -o " + "target/"+os.path.basename(file).split('/')[-1]+".o") != 0:

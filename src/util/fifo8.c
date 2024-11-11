@@ -1,6 +1,6 @@
 #include "fifo8.h"
 
-void fifo8_init(struct FIFO8* fifo, int size, unsigned char* buf) {
+void fifo8_init(struct FIFO8* fifo, int size, unsigned int* buf) {
     fifo->size = size;
     fifo->buf = buf;
     fifo->free = size; /* 缓冲区大小 */
@@ -10,7 +10,7 @@ void fifo8_init(struct FIFO8* fifo, int size, unsigned char* buf) {
     return;
 }
 
-int fifo8_put(struct FIFO8* fifo, unsigned char data) {
+int fifo8_put(struct FIFO8* fifo, unsigned int data) {
     if (fifo->free == 0) {
         /* 没有空间了，溢出 */
         fifo->flags |= FLAGS_OVERRUN;

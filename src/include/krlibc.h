@@ -4,6 +4,8 @@
 
 #define KHEAP_INITIAL_SIZE 0xf00000
 #define STACK_SIZE 32768
+
+#define USER_STACK_TOP 0xb2000000
 #define USER_AREA_START 0x90000000
 
 #define LONG_MAX 9223372036854775807L
@@ -56,6 +58,7 @@ int isdigit(int c);
 int isalpha(int c);
 int isupper(int c);
 void sleep(uint32_t time);
+void shutdown(); //main.c
 
 #define streq(s1, s2)                                                                              \
   ({                                                                                               \

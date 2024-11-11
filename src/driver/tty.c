@@ -40,8 +40,8 @@ tty_t* default_tty_alloc(){
     strcpy(tty->name,"ost/default");
 
     tty->fifo = kmalloc(sizeof(struct FIFO8));
-    char* buf = kmalloc(512);
-    fifo8_init(tty->fifo, 512, (unsigned char *)buf);
+    int* buf = kmalloc(512);
+    fifo8_init(tty->fifo, 512, (uint32_t*)buf);
     return tty;
 }
 

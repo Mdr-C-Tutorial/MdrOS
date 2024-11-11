@@ -18,5 +18,11 @@ Project struct document [Project docs](docs/README.md)
 ## Contributing
 
 Welcome to create pull requests or issues to this project. I am really happy to see it!
+<br>
+Below are all the contributors to MdrOS.
+
+* `xiaoyi1212` OS Developer
+* `wenxuanjun` OS Developer
+* `Minsecrus` OS Developer
 
 

@@ -1,14 +1,14 @@
 #pragma once
 
-#define MAX_SYSCALLS 256
+#define SYSCALL_PUTC 1
+#define SYSCALL_PRINT 2
+#define SYSCALL_GETCH 3
+#define SYSCALL_ALLOC_PAGE 4
+#define SYSCALL_FREE 5
+#define SYSCALL_EXIT 6
+#define SYSCALL_GET_ARG 7
 
-#define SYSCALL_PUTC 1 // 向终端put一个字符
-#define SYSCALL_PRINT 2 // 向终端put一个字符串 (用于提高运行速度, 而不至于字符串也用putc)
-#define SYSCALL_GETCH 3 // 获取该输入缓冲区顶部字符, 如缓冲区为空则阻塞
-#define SYSCALL_ALLOC_PAGE 4 // 用户堆扩容系统调用
-#define SYSCALL_FREE 5 // 用户堆释放系统调用
-#define SYSCALL_EXIT 6 // 终止该进程
-#define SYSCALL_GET_ARG 7 // 获取程序实参
+#include <stdint.h>
 
 #define __syscall0(id)                                                                             \
   ({                                                                                               \
@@ -97,10 +97,3 @@
 #define __syscall_argn(...)                                    __syscall_argn_private(0, ##__VA_ARGS__, 5, 4, 3, 2, 1, 0)
 #define __syscall(id, ...)                                                                         \
   __syscall_concat(__syscall, __syscall_argn(__VA_ARGS__))(id, ##__VA_ARGS__)
-
-#include "ctypes.h"
-
-typedef uint32_t (*syscall_t)(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
-
-void asm_syscall_handler(); //asmfunc.__asm__
-void setup_syscall();

@@ -23,6 +23,7 @@
 * `timer.c` RTC时钟中断
 * `vdisk.c` 存储设备驱动的抽象层接口
 * `vfs.c` 虚拟文件系统实现
+* `syscall.c` 系统调用实现
 
 ### memory
 
@@ -45,6 +46,7 @@
 * `acpi.c` ACPI驱动程序
 * `serial.c` 串口驱动程序
 * `tty.c` TTY设备管理
+* `cmos.c` CMOS芯片驱动
 
 ### pci
 
@@ -66,8 +68,8 @@ PCI设备驱动部分
 
 ### devfs
 
-* `devfs.c` Device File System
-* `devfs_sysinfo.c` 系统信息构建
+* `devfs.c` 设备虚拟文件系统
+* `iso9660.c` ISO9660 文件系统
 
 ## util
 
@@ -77,6 +79,7 @@ PCI设备驱动部分
 * `fifo8.c` FIFO缓冲队列
 * `klog.c` 内核日志实现
 * `krlibc.c` 内核常用的C标准库实现, 以及内核内存分布定义(在其对应的头文件)
+* `elf_util.c` ELF文件加载
 
 ### data
 
@@ -84,6 +87,12 @@ PCI设备驱动部分
 
 * `rbtree-strptr.c` 红黑树实现
 * `slist_strptr.c` 单向链表实现
+
+### sysapp
+
+内核内置的程序功能
+
+* `shell.c` 内核shell
 
 ## include
 

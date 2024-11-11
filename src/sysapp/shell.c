@@ -123,13 +123,18 @@ static void read(int argc,char** argv) {
     printk("Cannot read file.\n");
 }
 
+static void shutdown_os(){
+    shutdown();
+}
+
 static void print_help(){
-    printk("Usage <command|app> [argument...]\n");
+    printk("Usage <command|app_path> [argument...]\n");
     printk("help h ?                 Get shell command help.\n");
     printk("mkdir     <name>         Make a directory to vfs.\n");
     printk("mount     <dir> <dev>    Mount a file system to vfs directory.\n");
     printk("ls        [path]         List all file or directory.\n");
     printk("read      <path>         Read a text file.\n");
+    printk("shutdown                 Shutdown os.\n");
 }
 
 void setup_shell(){
@@ -170,9 +175,18 @@ void setup_shell(){
             mount(argc,argv);
         else if(!strcmp("read",argv[0]))
             read(argc,argv);
+        else if(!strcmp("shutdown",argv[0]))
+            shutdown_os();
         else{
-            if(create_user_process(argv[0],com_copy,"User",TASK_APPLICATION_LEVEL) == -1)
+            int pid;
+            if((pid = create_user_process(argv[0],com_copy,"User",TASK_APPLICATION_LEVEL)) == -1)
                 printk("\033[31m[Shell]: Unknown command '%s'.\033[39m\n", argv[0]);
+            pcb_t *pcb;
+            do{
+                pcb = found_pcb(pid);
+                if(pcb == NULL) break;
+            } while (1);
+            printk("\n");
         }
     }
 }

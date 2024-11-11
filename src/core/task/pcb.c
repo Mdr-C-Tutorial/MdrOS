@@ -7,6 +7,7 @@
 #include "io.h"
 #include "description_table.h"
 #include "elf_util.h"
+#include "free_page.h"
 
 extern pcb_t *current_pcb;
 extern pcb_t *running_proc_head;
@@ -73,8 +74,6 @@ int create_user_process(const char* path,const char* cmdline,char* name,uint8_t 
     vfs_node_t exefile = vfs_open(path);
     if(exefile == NULL) return -1;
 
-
-
     pcb_t *new_task = kmalloc(STACK_SIZE);
     memset(new_task, 0, sizeof(pcb_t));
 
@@ -88,12 +87,21 @@ int create_user_process(const char* path,const char* cmdline,char* name,uint8_t 
     new_task->cpu_clock = 0;
     new_task->exe_file = exefile;
     new_task->kernel_stack = new_task;
+    new_task->program_break = new_task->program_break_end = (void*)USER_AREA_START;
 
-    for (uint32_t i = 0xb2000000 - STACK_SIZE; i < 0xb2000000; i+= PAGE_SIZE) {
+    // 映射形参数据区
+    new_task->program_break_end += PAGE_SIZE;
+    for (uint32_t i = (uint32_t)new_task->program_break; i < (uint32_t)new_task->program_break_end; i += PAGE_SIZE) {
+        alloc_frame(get_page(i,1,new_task->pgd_dir),0,1);
+    }
+
+    // 映射用户栈区
+    for (uint32_t i = USER_STACK_TOP - STACK_SIZE; i < USER_STACK_TOP; i+= PAGE_SIZE) {
         alloc_frame(get_page(i,1,new_task->pgd_dir),0,1);
     }
     new_task->user_stack = (void*)0xb2000000 - STACK_SIZE;
 
+    // 读取可执行文件
     page_directory_t *cur_dir = get_current_proc()->pgd_dir;
     disable_scheduler();
     io_sti();
@@ -104,6 +112,7 @@ int create_user_process(const char* path,const char* cmdline,char* name,uint8_t 
         return -1;
     }
     uint32_t _start = elf_load(exefile->size,data);
+    kfree(data);
     switch_page_directory(cur_dir);
     io_cli();
     enable_scheduler();
@@ -159,6 +168,19 @@ int create_kernel_thread(int (*_start)(void* arg),void *args,char* name){ //创�
     return new_task->pid;
 }
 
+void kill_all_proc() {
+    pcb_t *head = running_proc_head;
+    while (1) {
+        head = head->next;
+        if (head == NULL || head->pid == running_proc_head->pid) {
+            return;
+        }
+        if (head->pid == get_current_proc()->pid) continue;
+        printk("Kill process [PID: %d].\n",head->pid);
+        kill_proc(head);
+    }
+}
+
 void kill_proc(pcb_t *pcb){
     io_cli();
     if (pcb->pid == 0) {
@@ -171,6 +193,7 @@ void kill_proc(pcb_t *pcb){
 
     } else{
         vfs_close(pcb->exe_file);
+        put_directory(pcb->pgd_dir);
     }
 
     free_tty(pcb->tty);

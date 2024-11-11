@@ -7,6 +7,7 @@
 #include "timer.h"
 #include "acpi.h"
 #include "page.h"
+#include "free_page.h"
 #include "pci.h"
 #include "ide.h"
 #include "vdisk.h"
@@ -23,6 +24,14 @@
 extern void* program_break_end;
 
 extern void iso9660_regist(); //iso9660.c
+
+_Noreturn void shutdown(){
+    printk("Shutdown %s...\n",KERNEL_NAME);
+    kill_all_proc();
+    sleep(10);
+    power_off();
+    while (1);
+}
 
 /*
  * 内核初始化函数, 最终会演变为CPU0的IDLE进程
@@ -44,6 +53,7 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
 
     init_vbe(multiboot);
     page_init(multiboot); //分页开启
+    setup_free_page();
     terminal_setup();
 
     printk("MdrOS v0.0.1 %s (Limine Multiboot) on an i386\n",KERNEL_NAME);
@@ -62,7 +72,6 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     io_cli(); //ide驱动会打开中断以加载硬盘设备, 需重新关闭中断以继续初始化其余OS功能
     iso9660_regist();
     init_pcb();
-
     keyboard_init();
     setup_syscall();
     create_kernel_thread((void*)setup_shell, NULL, "Shell");
@@ -75,5 +84,8 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     enable_scheduler();
     io_sti(); //内核加载完毕, 打开中断以启动进程调度器, 开始运行
 
-    while(1) io_hlt();
+    while(1){
+        free_pages();
+        io_hlt();
+    }
 }
