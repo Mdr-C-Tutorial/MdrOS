@@ -38,10 +38,6 @@ OS第三方静态库
 
 `libelf_parse.a` elf_parse静态库
 
-## apps
-
-OS外置应用程序以及libc实现
-
 ## target
 
 > 仅存在于使用 `build.py` 构建脚本

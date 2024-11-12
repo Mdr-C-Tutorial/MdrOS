@@ -15,36 +15,17 @@ add_arflags("-target x86-freestanding")
 add_ldflags("-target x86-freestanding")
 add_cflags("-mno-80387", "-mno-mmx", "-mno-sse", "-mno-sse2")
 
-target("libc")
-    set_kind("static")
-    set_toolchains("@zig")
-    set_default(false)
-
-    add_includedirs("apps/include")
-    add_headerfiles("apps/libc/*.h")
-    add_files("apps/libc/**.c")
-
-target("shell")
-    set_kind("binary")
-    add_deps("libc")
-    set_toolchains("@zig")
-    set_default(false)
-
-    add_includedirs("apps/include")
-    add_files("apps/shell/**.c")
-
 target("kernel")
     set_kind("binary")
-    add_deps("shell")
     set_toolchains("@zig", "nasm")
     set_default(false)
 
     add_linkdirs("libs")
-    add_includedirs("kernel/include")
+    add_includedirs("src/include")
 
     add_links("os_terminal")
     add_links("elf_parse")
-    add_files("kernel/**/*.asm", "kernel/**/*.c")
+    add_files("src/**/*.asm", "src/**/*.c")
 
     add_asflags("-f", "elf32")
     add_ldflags("-T", "linker.ld")
@@ -63,8 +44,6 @@ target("iso")
 
         local kernel = project.target("kernel")
         os.cp(kernel:targetfile(), iso_dir .. "/cpkrnl.elf")
-        local shell = project.target("shell")
-        os.cp(kernel:targetfile(), iso_dir .. "/apps/shell.elf")
 
         local iso_file = "$(buildir)/mdros.iso"
         local xorriso_flags = "-b limine/limine-bios-cd.bin -no-emul-boot -boot-info-table"
