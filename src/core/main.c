@@ -48,20 +48,17 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     idt_install(); //8259A PIC初始化
     tty_init(); //tty 设备初始化
 
-    init_timer(1); //RTC 时钟中断
-    acpi_install();  //ACPI初始化
-
     init_vbe(multiboot);
     page_init(multiboot); //分页开启
     setup_free_page();
     terminal_setup();
-
     printk("MdrOS v0.0.1 %s (Limine Multiboot) on an i386\n",KERNEL_NAME);
     printk("KernelArea: 0x00000000 - 0x%08x | GraphicsBuffer: 0x%08x \n",
            program_break_end,
            multiboot->framebuffer_addr);
     klogf(true, "Memory manager initialize.\n");
-
+    acpi_install();  //ACPI初始化
+    init_timer(1); //RTC 时钟中断
     vdisk_init();
     vfs_init();
     init_pci(); //pci设备列表加载, 所有PCI设备相关驱动初始化需在此函数后方调用

@@ -185,7 +185,19 @@ void page_fault(registers_t *regs) {
     int reserved = regs->err_code & 0x8; // 写入CPU保留位
     int id = regs->err_code & 0x10; // 由取指引起
 
-    printk("[ERROR]: Page fault [PID: %d |Level: %d] |",get_current_proc()->pid,get_current_proc()->task_level);
+    logkf("[ERROR]: Page fault [Not Process] | Type: %s | address: %x \n",
+          (
+                  present ? "present" : (
+                          rw ? "read-only" : (
+                                  us ? "user-mode" : (
+                                          reserved ? "reserved" : (
+                                                  id ? "decode address" : "unknown"))))
+          ),
+          faulting_address); //调试: 串口优先打印信息, 屏蔽虚拟终端的BUG
+
+    if(get_current_proc() == NULL){
+        printk("[ERROR]: Page fault [Not Process] |");
+    } else printk("[ERROR]: Page fault [PID: %d |Level: %d] |",get_current_proc()->pid,get_current_proc()->task_level);
     if (present) {
         printk("Type: present | address: %x  \n", faulting_address);
     } else if (rw) {
@@ -196,6 +208,10 @@ void page_fault(registers_t *regs) {
         printk("Type: reserved | address: %x\n", faulting_address);
     } else if (id) {
         printk("Type: decode address | address: %x\n", faulting_address);
+    }
+    if(get_current_proc() == NULL){
+        klogf(false,"Kernel Error Panic.\n");
+        while (1) io_hlt();
     }
 
     // 多进程相关, 未实现多进程的OS可将以下代码全部替换为 while(1)
@@ -210,8 +226,6 @@ void page_fault(registers_t *regs) {
         while (1) io_hlt();
     }
 
-
-
     enable_scheduler();
     io_sti();
 }
@@ -221,6 +235,7 @@ void page_init(multiboot_t *multiboot){
     nframes = mem_end_page / PAGE_SIZE;
 
     program_break_end = program_break + 0x300000 + 1 + KHEAP_INITIAL_SIZE;
+    memset(program_break, 0, program_break_end - program_break);
 
     frames = (uint32_t *) kmalloc(INDEX_FROM_BIT(nframes));
     memset(frames, 0, INDEX_FROM_BIT(nframes));
@@ -240,10 +255,6 @@ void page_init(multiboot_t *multiboot){
         alloc_frame(p, 1, 1);
         i += PAGE_SIZE;
     }
-
-    for (uint32_t j = (uint32_t )hpetInfo; j < ((uint32_t)hpetInfo)+ sizeof(HpetInfo); j+= PAGE_SIZE) {
-        alloc_frame_line(get_page(j,1,kernel_directory),j,1,0);
-    } //acpi Hpet表单独映射
 
     uint32_t j = multiboot->framebuffer_addr,
             size = multiboot->framebuffer_height * multiboot->framebuffer_width*multiboot->framebuffer_bpp;

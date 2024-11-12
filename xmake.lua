@@ -52,6 +52,6 @@ target("iso")
     end)
 
     on_run(function (target)
-        local flags = "-device sb16 -m 4096 -no-reboot"
+        local flags = "-serial stdio -m 4096"
         os.exec("qemu-system-i386 -cdrom $(buildir)/mdros.iso %s", flags)
     end)

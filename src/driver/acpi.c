@@ -4,6 +4,7 @@
 #include "timer.h"
 #include "krlibc.h"
 #include "isr.h"
+#include "page.h"
 
 uint16_t SLP_TYPa;
 uint16_t SLP_TYPb;
@@ -26,6 +27,10 @@ uint8_t *rsdp_address;
 
 HpetInfo *hpetInfo = NULL;
 static uint32_t hpetPeriod = 0;
+
+#define page_line(ptr) do { \
+     alloc_frame_line(get_page((uint32_t)ptr,1,get_current_directory()),(uint32_t)ptr,1,1);                       \
+}while(0)
 
 static void AcpiPowerHandler(registers_t *irq) {
     io_cli();
@@ -101,6 +106,7 @@ static int AcpiSysInit() {
     uint32_t dsdtlen;
 
     rsdt = (acpi_rsdt_t *) AcpiGetRSDPtr();
+    page_line(rsdt);
     if (!rsdt || AcpiCheckHeader(rsdt, "RSDT") < 0) {
         printk("No ACPI\n");
         return false;
@@ -109,6 +115,7 @@ static int AcpiSysInit() {
     entrys = rsdt->length - HEADER_SIZE / 4;
     p = &(rsdt->entry);
     while (entrys--) {
+        page_line(*p);
         if (!AcpiCheckHeader(*p, "FACP")) {
             facp = (acpi_facp_t *) *p;
 
@@ -130,7 +137,7 @@ static int AcpiSysInit() {
 
             uint8_t * S5Addr;
             uint32_t dsdtlen;
-
+            page_line(facp->DSDT);
             if (!AcpiCheckHeader(facp->DSDT, "DSDT")) {
                 S5Addr = &(facp->DSDT->definition_block);
                 dsdtlen = facp->DSDT->length - HEADER_SIZE;
@@ -339,6 +346,7 @@ void hpet_initialize() {
     }
 
     hpetInfo = (HpetInfo *) hpet->hpetAddress.address;
+    page_line(hpetInfo);
 
     uint32_t counterClockPeriod = hpetInfo->generalCapabilities >> 32;
     hpetPeriod = counterClockPeriod / 1000000;
@@ -347,10 +355,11 @@ void hpet_initialize() {
 }
 
 void acpi_install() {
-    klogf(AcpiSysInit(), "Load acpi driver.\n");
+    int b = AcpiSysInit();
     acpi_enable_flag = !acpi_enable();
     hpet_initialize();
     AcpiPowerInit();
+    klogf(b & acpi_enable_flag, "Load acpi driver. NanoTime: %d\n",nanoTime());
 }
 
 uint32_t nanoTime() {
