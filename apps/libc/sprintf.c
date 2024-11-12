@@ -1,11 +1,11 @@
-#include "stdio.h"
-#include "string.h"
-#include "stdlib.h"
 #include "ctype.h"
 #include "math.h"
-#include <stdint.h>
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define CVT_BUFSZ (309 + 43)
 
@@ -15,28 +15,29 @@
 #define SIZE_T_RANK rank_long
 #define PTRDIFF_T_RANK rank_long
 
-#define ZEROPAD    1        /* pad with zero */
-#define SIGN    2        /* unsigned/signed long */
-#define PLUS    4        /* show plus */
-#define SPACE    8        /* space if plus */
-#define LEFT    16        /* left justified */
-#define SMALL    32        /* Must be 32 == 0x20 */
-#define SPECIAL    64        /* 0x */
+#define ZEROPAD 1  /* pad with zero */
+#define SIGN 2     /* unsigned/signed long */
+#define PLUS 4     /* show plus */
+#define SPACE 8    /* space if plus */
+#define LEFT 16    /* left justified */
+#define SMALL 32   /* Must be 32 == 0x20 */
+#define SPECIAL 64 /* 0x */
 
-#define __do_div(n, base) ({ \
-int __res; \
-__res = ((unsigned long) n) % (unsigned) base; \
-n = ((unsigned long) n) / (unsigned) base; \
-__res; })
-
+#define __do_div(n, base)                                                      \
+    ({                                                                         \
+        int __res;                                                             \
+        __res = ((unsigned long)n) % (unsigned)base;                           \
+        n = ((unsigned long)n) / (unsigned)base;                               \
+        __res;                                                                 \
+    })
 
 #define EMIT(x)                                                                \
-  ({                                                                           \
-    if (o < n) {                                                               \
-      *q++ = (x);                                                              \
-    }                                                                          \
-    o++;                                                                       \
-  })
+    ({                                                                         \
+        if (o < n) {                                                           \
+            *q++ = (x);                                                        \
+        }                                                                      \
+        o++;                                                                   \
+    })
 
 enum ranks {
     rank_char = -2,
@@ -83,7 +84,7 @@ static char *cvt(double arg, int ndigits, int *decpt, int *sign, char *buf,
         p1 = &buf[CVT_BUFSZ];
         while (fi != 0) {
             fj = modf(fi / 10, &fi);
-            *--p1 = (int) ((fj + .03) * 10) + '0';
+            *--p1 = (int)((fj + .03) * 10) + '0';
             r2++;
         }
         while (p1 < &buf[CVT_BUFSZ])
@@ -107,7 +108,7 @@ static char *cvt(double arg, int ndigits, int *decpt, int *sign, char *buf,
     while (p <= p1 && p < &buf[CVT_BUFSZ]) {
         arg *= 10;
         arg = modf(arg, &fj);
-        *p++ = (int) fj + '0';
+        *p++ = (int)fj + '0';
     }
 
     if (p1 >= &buf[CVT_BUFSZ]) {
@@ -263,7 +264,8 @@ static void cropzeros(char *buffer) {
             buffer--;
         if (*buffer == '.')
             buffer--;
-        while ((*++buffer = *stop++));
+        while ((*++buffer = *stop++))
+            ;
     }
 }
 
@@ -350,9 +352,9 @@ static size_t format_int(char *q, size_t n, uintmax_t val, enum flags flags,
     /*
      * If signed, separate out the minus
      */
-    if ((flags & FL_SIGNED) && ((intmax_t) val < 0)) {
+    if ((flags & FL_SIGNED) && ((intmax_t)val < 0)) {
         minus = 1;
-        val = (uintmax_t)(-(intmax_t) val);
+        val = (uintmax_t)(-(intmax_t)val);
     }
 
     /*
@@ -543,7 +545,6 @@ static char *number(char *str, long num, int base, int size, int precision,
     return str;
 }
 
-
 int sprintf(char *buf, const char *fmt, ...) {
     va_list args;
     int i;
@@ -561,12 +562,12 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
     char *str;
     const char *s;
 
-    int flags;        /* flags to number() */
+    int flags; /* flags to number() */
 
-    int field_width;    /* width of output field */
-    int precision;        /* min. # of digits for integers; max
-				   number of chars for from string */
-    int qualifier;        /* 'h', 'l', or 'L' for integer fields */
+    int field_width; /* width of output field */
+    int precision;   /* min. # of digits for integers; max
+              number of chars for from string */
+    int qualifier;   /* 'h', 'l', or 'L' for integer fields */
 
     for (str = buf; *fmt; ++fmt) {
         if (*fmt != '%') {
@@ -576,24 +577,24 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
 
         /* process flags */
         flags = 0;
-        repeat:
-        ++fmt;        /* this also skips first '%' */
+    repeat:
+        ++fmt; /* this also skips first '%' */
         switch (*fmt) {
-            case '-':
-                flags |= LEFT;
-                goto repeat;
-            case '+':
-                flags |= PLUS;
-                goto repeat;
-            case ' ':
-                flags |= SPACE;
-                goto repeat;
-            case '#':
-                flags |= SPECIAL;
-                goto repeat;
-            case '0':
-                flags |= ZEROPAD;
-                goto repeat;
+        case '-':
+            flags |= LEFT;
+            goto repeat;
+        case '+':
+            flags |= PLUS;
+            goto repeat;
+        case ' ':
+            flags |= SPACE;
+            goto repeat;
+        case '#':
+            flags |= SPECIAL;
+            goto repeat;
+        case '0':
+            flags |= ZEROPAD;
+            goto repeat;
         }
 
         /* get field width */
@@ -603,8 +604,7 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
         else if (*fmt == '*') {
             ++fmt;
             /* it's the next argument */
-            field_width = va_arg(args,
-                                 int);
+            field_width = va_arg(args, int);
             if (field_width < 0) {
                 field_width = -field_width;
                 flags |= LEFT;
@@ -620,8 +620,7 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
             else if (*fmt == '*') {
                 ++fmt;
                 /* it's the next argument */
-                precision = va_arg(args,
-                                   int);
+                precision = va_arg(args, int);
             }
             if (precision < 0)
                 precision = 0;
@@ -638,98 +637,89 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
         base = 10;
 
         switch (*fmt) {
-            case 'c':
-                if (!(flags & LEFT))
-                    while (--field_width > 0)
-                        *str++ = ' ';
-                *str++ = (unsigned char) va_arg(args,
-                                                int);
+        case 'c':
+            if (!(flags & LEFT))
                 while (--field_width > 0)
                     *str++ = ' ';
-                continue;
+            *str++ = (unsigned char)va_arg(args, int);
+            while (--field_width > 0)
+                *str++ = ' ';
+            continue;
 
-            case 's':
-                s = va_arg(args,
-                           char *);
-                len = strnlen(s, precision);
+        case 's':
+            s = va_arg(args, char *);
+            len = strnlen(s, precision);
 
-                if (!(flags & LEFT))
-                    while (len < field_width--)
-                        *str++ = ' ';
-                for (i = 0; i < len; ++i)
-                    *str++ = *s++;
+            if (!(flags & LEFT))
                 while (len < field_width--)
                     *str++ = ' ';
-                continue;
+            for (i = 0; i < len; ++i)
+                *str++ = *s++;
+            while (len < field_width--)
+                *str++ = ' ';
+            continue;
 
-            case 'p':
-                if (field_width == -1) {
-                    field_width = 2 * sizeof(void *);
-                    flags |= ZEROPAD;
-                }
-                str = number(str, (unsigned long) va_arg(args,
-                                                         void *), 16,
-                             field_width, precision, flags);
-                continue;
+        case 'p':
+            if (field_width == -1) {
+                field_width = 2 * sizeof(void *);
+                flags |= ZEROPAD;
+            }
+            str = number(str, (unsigned long)va_arg(args, void *), 16,
+                         field_width, precision, flags);
+            continue;
 
-            case 'n':
-                if (qualifier == 'l') {
-                    long *ip = va_arg(args,
-                                      long *);
-                    *ip = (str - buf);
-                } else {
-                    int *ip = va_arg(args,
-                                     int *);
-                    *ip = (str - buf);
-                }
-                continue;
+        case 'n':
+            if (qualifier == 'l') {
+                long *ip = va_arg(args, long *);
+                *ip = (str - buf);
+            } else {
+                int *ip = va_arg(args, int *);
+                *ip = (str - buf);
+            }
+            continue;
 
-            case '%':
-                *str++ = '%';
-                continue;
+        case '%':
+            *str++ = '%';
+            continue;
 
-                /* integer number formats - set up the flags and "break" */
-            case 'o':
-                base = 8;
-                break;
+            /* integer number formats - set up the flags and "break" */
+        case 'o':
+            base = 8;
+            break;
 
-            case 'x':
-                flags |= SMALL;
-            case 'X':
-                base = 16;
-                break;
+        case 'x':
+            flags |= SMALL;
+        case 'X':
+            base = 16;
+            break;
 
-            case 'd':
-            case 'i':
-                flags |= SIGN;
-            case 'u':
-                break;
-            case 'f':
-                str = ftoa(va_arg(args, double), str, precision);
-                break;
+        case 'd':
+        case 'i':
+            flags |= SIGN;
+        case 'u':
+            break;
+        case 'f':
+            str = ftoa(va_arg(args, double), str, precision);
+            break;
 
-            default:
-                *str++ = '%';
-                if (*fmt)
-                    *str++ = *fmt;
-                else
-                    --fmt;
-                continue;
+        default:
+            *str++ = '%';
+            if (*fmt)
+                *str++ = *fmt;
+            else
+                --fmt;
+            continue;
         }
         if (qualifier == 'l')
-            num = va_arg(args,
-                         unsigned long);
+            num = va_arg(args, unsigned long);
         else if (qualifier == 'h') {
-            num = (unsigned short) va_arg(args,
-                                          int);
+            num = (unsigned short)va_arg(args, int);
             if (flags & SIGN)
-                num = (short) num;
+                num = (short)num;
         } else if (flags & SIGN)
-            num = va_arg(args,
-                         int);
+            num = va_arg(args, int);
         else
-            num = va_arg(args,
-                         unsigned int);
+            num = va_arg(args, unsigned int);
         str = number(str, num, base, field_width, precision, flags);
     }
     *str = '\0';
@@ -761,299 +751,271 @@ int vsnprintf(char *buf, size_t n, const char *fmt, va_list ap) {
 
     while ((ch = *p++)) {
         switch (state) {
-            case st_normal:
-                if (ch == '%') {
-                    state = st_flags;
-                    flags = 0;
-                    rank = rank_int;
-                    width = 0;
+        case st_normal:
+            if (ch == '%') {
+                state = st_flags;
+                flags = 0;
+                rank = rank_int;
+                width = 0;
+                prec = -1;
+            } else {
+                EMIT(ch);
+            }
+            break;
+
+        case st_flags:
+            switch (ch) {
+            case '-':
+                flags |= FL_MINUS;
+                break;
+            case '+':
+                flags |= FL_PLUS;
+                break;
+            case '\'':
+                flags |= FL_TICK;
+                break;
+            case ' ':
+                flags |= FL_SPACE;
+                break;
+            case '#':
+                flags |= FL_HASH;
+                break;
+            case '0':
+                flags |= FL_ZERO;
+                break;
+            default:
+                state = st_width;
+                p--; /* Process this character again */
+                break;
+            }
+            break;
+
+        case st_width:
+            if (ch >= '0' && ch <= '9') {
+                width = width * 10 + (ch - '0');
+            } else if (ch == '*') {
+                width = va_arg(ap, int);
+                if (width < 0) {
+                    width = -width;
+                    flags |= FL_MINUS;
+                }
+            } else if (ch == '.') {
+                prec = 0; /* Precision given */
+                state = st_prec;
+            } else {
+                state = st_modifiers;
+                p--; /* Process this character again */
+            }
+            break;
+
+        case st_prec:
+            if (ch >= '0' && ch <= '9') {
+                prec = prec * 10 + (ch - '0');
+            } else if (ch == '*') {
+                prec = va_arg(ap, int);
+                if (prec < 0)
                     prec = -1;
-                } else {
-                    EMIT(ch);
-                }
-                break;
+            } else {
+                state = st_modifiers;
+                p--; /* Process this character again */
+            }
+            break;
 
-            case st_flags:
+        case st_modifiers:
+            switch (ch) {
+            /*
+             * Length modifiers - nonterminal sequences
+             */
+            case 'h':
+                rank--; /* Shorter rank */
+                break;
+            case 'l':
+                rank++; /* Longer rank */
+                break;
+            case 'j':
+                rank = INTMAX_RANK;
+                break;
+            case 'z':
+                rank = SIZE_T_RANK;
+                break;
+            case 't':
+                rank = PTRDIFF_T_RANK;
+                break;
+            case 'L':
+            case 'q':
+                rank += 2;
+                break;
+            default:
+                /*
+                 * Next state will be normal
+                 */
+                state = st_normal;
+
+                /*
+                 * Canonicalize rank
+                 */
+                if (rank < MIN_RANK)
+                    rank = MIN_RANK;
+                else if (rank > MAX_RANK)
+                    rank = MAX_RANK;
+
                 switch (ch) {
-                    case '-':
-                        flags |= FL_MINUS;
-                        break;
-                    case '+':
-                        flags |= FL_PLUS;
-                        break;
-                    case '\'':
-                        flags |= FL_TICK;
-                        break;
-                    case ' ':
-                        flags |= FL_SPACE;
-                        break;
-                    case '#':
-                        flags |= FL_HASH;
-                        break;
-                    case '0':
-                        flags |= FL_ZERO;
-                        break;
-                    default:
-                        state = st_width;
-                        p--; /* Process this character again */
-                        break;
-                }
-                break;
+                case 'P': /* Upper case pointer */
+                    flags |= FL_UPPER;
+                    break;
+                case 'p': /* Pointer */
+                    base = 16;
+                    prec = (8 * sizeof(void *) + 3) / 4;
+                    flags |= FL_HASH;
+                    val = (uintmax_t)(uintptr_t)va_arg(ap, void *);
+                    goto is_integer;
 
-            case st_width:
-                if (ch >= '0' && ch <= '9') {
-                    width = width * 10 + (ch - '0');
-                } else if (ch == '*') {
-                    width = va_arg(ap,
-                    int);
-                    if (width < 0) {
-                        width = -width;
-                        flags |= FL_MINUS;
+                case 'd': /* Signed decimal output */
+                case 'i':
+                    base = 10;
+                    flags |= FL_SIGNED;
+                    switch (rank) {
+                    case rank_char:
+                        /* Yes, all these casts are needed */
+                        val = (uintmax_t)(intmax_t)(signed char)va_arg(
+                            ap, signed int);
+                        break;
+                    case rank_short:
+                        val = (uintmax_t)(intmax_t)(signed short)va_arg(
+                            ap, signed int);
+                        break;
+                    case rank_int:
+                        val = (uintmax_t)(intmax_t)va_arg(ap, signed int);
+                        break;
+                    case rank_long:
+                        val = (uintmax_t)(intmax_t)va_arg(ap, signed long);
+                        break;
+                    case rank_longlong:
+                        val = (uintmax_t)(intmax_t)va_arg(ap, signed long long);
+                        break;
                     }
-                } else if (ch == '.') {
-                    prec = 0; /* Precision given */
-                    state = st_prec;
-                } else {
-                    state = st_modifiers;
-                    p--; /* Process this character again */
-                }
-                break;
+                    goto is_integer;
+                case 'o': /* Octal */
+                    base = 8;
+                    goto is_unsigned;
+                case 'u': /* Unsigned decimal */
+                    base = 10;
+                    goto is_unsigned;
+                case 'X': /* Upper case hexadecimal */
+                    flags |= FL_UPPER;
+                    base = 16;
+                    goto is_unsigned;
+                case 'x': /* Hexadecimal */
+                    base = 16;
+                    goto is_unsigned;
 
-            case st_prec:
-                if (ch >= '0' && ch <= '9') {
-                    prec = prec * 10 + (ch - '0');
-                } else if (ch == '*') {
-                    prec = va_arg(ap,
-                    int);
-                    if (prec < 0)
-                        prec = -1;
-                } else {
-                    state = st_modifiers;
-                    p--; /* Process this character again */
-                }
-                break;
-
-            case st_modifiers:
-                switch (ch) {
-                    /*
-                     * Length modifiers - nonterminal sequences
-                     */
-                    case 'h':
-                        rank--; /* Shorter rank */
+                is_unsigned:
+                    switch (rank) {
+                    case rank_char:
+                        val =
+                            (uintmax_t)(unsigned char)va_arg(ap, unsigned int);
                         break;
-                    case 'l':
-                        rank++; /* Longer rank */
+                    case rank_short:
+                        val =
+                            (uintmax_t)(unsigned short)va_arg(ap, unsigned int);
                         break;
-                    case 'j':
-                        rank = INTMAX_RANK;
+                    case rank_int:
+                        val = (uintmax_t)va_arg(ap, unsigned int);
                         break;
-                    case 'z':
-                        rank = SIZE_T_RANK;
+                    case rank_long:
+                        val = (uintmax_t)va_arg(ap, unsigned long);
                         break;
-                    case 't':
-                        rank = PTRDIFF_T_RANK;
+                    case rank_longlong:
+                        val = (uintmax_t)va_arg(ap, unsigned long long);
                         break;
-                    case 'L':
-                    case 'q':
-                        rank += 2;
-                        break;
-                    default:
-                        /*
-                         * Next state will be normal
-                         */
-                        state = st_normal;
+                    }
 
-                        /*
-                         * Canonicalize rank
-                         */
-                        if (rank < MIN_RANK)
-                            rank = MIN_RANK;
-                        else if (rank > MAX_RANK)
-                            rank = MAX_RANK;
+                is_integer:
+                    sz = format_int(q, (o < n) ? n - o : 0, val, flags, base,
+                                    width, prec);
+                    q += sz;
+                    o += sz;
+                    break;
 
-                        switch (ch) {
-                            case 'P': /* Upper case pointer */
-                                flags |= FL_UPPER;
-                                break;
-                            case 'p': /* Pointer */
-                                base = 16;
-                                prec = (8 * sizeof(void *) + 3) / 4;
-                                flags |= FL_HASH;
-                                val = (uintmax_t)(uintptr_t)
-                                va_arg(ap,
-                                void *);
-                                goto is_integer;
+                case 'c': /* Character */
+                    carg = (char)va_arg(ap, int);
+                    sarg = &carg;
+                    slen = 1;
+                    goto is_string;
+                case 's': /* String */
+                    sarg = va_arg(ap, const char *);
+                    sarg = sarg ? sarg : "(null)";
+                    slen = strlen(sarg);
+                    goto is_string;
 
-                            case 'd': /* Signed decimal output */
-                            case 'i':
-                                base = 10;
-                                flags |= FL_SIGNED;
-                                switch (rank) {
-                                    case rank_char:
-                                        /* Yes, all these casts are needed */
-                                        val = (uintmax_t)(intmax_t)(
-                                        signed char)va_arg(ap,
-                                        signed int);
-                                        break;
-                                    case rank_short:
-                                        val = (uintmax_t)(intmax_t)(
-                                        signed short)va_arg(ap,
-                                        signed int);
-                                        break;
-                                    case rank_int:
-                                        val = (uintmax_t)(intmax_t)
-                                        va_arg(ap,
-                                        signed int);
-                                        break;
-                                    case rank_long:
-                                        val = (uintmax_t)(intmax_t)
-                                        va_arg(ap,
-                                        signed long);
-                                        break;
-                                    case rank_longlong:
-                                        val = (uintmax_t)(intmax_t)
-                                        va_arg(ap,
-                                        signed long long);
-                                        break;
-                                }
-                                goto is_integer;
-                            case 'o': /* Octal */
-                                base = 8;
-                                goto is_unsigned;
-                            case 'u': /* Unsigned decimal */
-                                base = 10;
-                                goto is_unsigned;
-                            case 'X': /* Upper case hexadecimal */
-                                flags |= FL_UPPER;
-                                base = 16;
-                                goto is_unsigned;
-                            case 'x': /* Hexadecimal */
-                                base = 16;
-                                goto is_unsigned;
+                is_string: {
+                    char sch;
+                    int i;
 
-                            is_unsigned:
-                                switch (rank) {
-                                    case rank_char:
-                                        val = (uintmax_t)(
-                                        unsigned char)va_arg(ap,
-                                        unsigned int);
-                                        break;
-                                    case rank_short:
-                                        val = (uintmax_t)(
-                                        unsigned short)va_arg(ap,
-                                        unsigned int);
-                                        break;
-                                    case rank_int:
-                                        val = (uintmax_t) va_arg(ap,
-                                        unsigned int);
-                                        break;
-                                    case rank_long:
-                                        val = (uintmax_t) va_arg(ap,
-                                        unsigned long);
-                                        break;
-                                    case rank_longlong:
-                                        val = (uintmax_t) va_arg(ap,
-                                        unsigned long long);
-                                        break;
-                                }
+                    if (prec != -1 && slen > prec)
+                        slen = prec;
 
-                            is_integer:
-                                sz =
-                                        format_int(q, (o < n) ? n - o : 0, val, flags, base, width, prec);
-                                q += sz;
-                                o += sz;
-                                break;
-
-                            case 'c': /* Character */
-                                carg = (char) va_arg(ap,
-                                int);
-                                sarg = &carg;
-                                slen = 1;
-                                goto is_string;
-                            case 's': /* String */
-                                sarg = va_arg(ap,
-                                const char *);
-                                sarg = sarg ? sarg : "(null)";
-                                slen = strlen(sarg);
-                                goto is_string;
-
-                            is_string:
-                            {
-                                char sch;
-                                int i;
-
-                                if (prec != -1 && slen > prec)
-                                    slen = prec;
-
-                                if (width > slen && !(flags & FL_MINUS)) {
-                                    char pad = (flags & FL_ZERO) ? '0' : ' ';
-                                    while (width > slen) {
-                                        EMIT(pad);
-                                        width--;
-                                    }
-                                }
-                                for (i = slen; i; i--) {
-                                    sch = *sarg++;
-                                    EMIT(sch);
-                                }
-                                if (width > slen && (flags & FL_MINUS)) {
-                                    while (width > slen) {
-                                        EMIT(' ');
-                                        width--;
-                                    }
-                                }
-                            }
-                                break;
-
-                            case 'n': {
-                                /*
-                                 * Output the number of characters written
-                                 */
-                                switch (rank) {
-                                    case rank_char:
-                                        *va_arg(ap,
-                                        signed char *) = o;
-                                        break;
-                                    case rank_short:
-                                        *va_arg(ap,
-                                        signed short *) = o;
-                                        break;
-                                    case rank_int:
-                                        *va_arg(ap,
-                                        signed int *) = o;
-                                        break;
-                                    case rank_long:
-                                        *va_arg(ap,
-                                        signed long *) = o;
-                                        break;
-                                    case rank_longlong:
-                                        *va_arg(ap,
-                                        signed long long *) = o;
-                                        break;
-                                }
-                            }
-                                break;
-
-                            case 'E':
-                            case 'G':
-                            case 'e':
-                            case 'f':
-                            case 'g':
-                                sz =
-                                        format_float(q, (o < n) ? n - o : 0, (double) (va_arg(ap,
-                                double)),
-                                flags, ch, width, prec);
-                                q += sz;
-                                o += sz;
-                                break;
-
-                            default: /* Anything else, including % */
-                                EMIT(ch);
-                                break;
+                    if (width > slen && !(flags & FL_MINUS)) {
+                        char pad = (flags & FL_ZERO) ? '0' : ' ';
+                        while (width > slen) {
+                            EMIT(pad);
+                            width--;
                         }
+                    }
+                    for (i = slen; i; i--) {
+                        sch = *sarg++;
+                        EMIT(sch);
+                    }
+                    if (width > slen && (flags & FL_MINUS)) {
+                        while (width > slen) {
+                            EMIT(' ');
+                            width--;
+                        }
+                    }
+                } break;
+
+                case 'n': {
+                    /*
+                     * Output the number of characters written
+                     */
+                    switch (rank) {
+                    case rank_char:
+                        *va_arg(ap, signed char *) = o;
                         break;
+                    case rank_short:
+                        *va_arg(ap, signed short *) = o;
+                        break;
+                    case rank_int:
+                        *va_arg(ap, signed int *) = o;
+                        break;
+                    case rank_long:
+                        *va_arg(ap, signed long *) = o;
+                        break;
+                    case rank_longlong:
+                        *va_arg(ap, signed long long *) = o;
+                        break;
+                    }
+                } break;
+
+                case 'E':
+                case 'G':
+                case 'e':
+                case 'f':
+                case 'g':
+                    sz = format_float(q, (o < n) ? n - o : 0,
+                                      (double)(va_arg(ap, double)), flags, ch,
+                                      width, prec);
+                    q += sz;
+                    o += sz;
+                    break;
+
+                default: /* Anything else, including % */
+                    EMIT(ch);
+                    break;
                 }
                 break;
+            }
+            break;
         }
     }
 

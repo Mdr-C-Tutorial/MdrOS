@@ -24,21 +24,20 @@ typedef enum {
     MODE_m = 'm'
 } vt100_mode_t;
 
-typedef struct tty_device{
-    void (*print)(struct tty_device *res,const char *string);
-    void (*putchar)(struct tty_device *res,int c);
+typedef struct tty_device {
+    void (*print)(struct tty_device *res, const char *string);
+    void (*putchar)(struct tty_device *res, int c);
     void (*clear)(struct tty_device *res);
-    void (*move_cursor)(struct tty_device *res,int x, int y);
+    void (*move_cursor)(int x, int y);
 
-    uint32_t volatile*video_ram; //显存基址
-    uint32_t width,height;
+    uint32_t volatile *video_ram; // 显存基址
+    uint32_t width, height;
     int x, y;
     uint32_t color, back_color;
     struct FIFO8 *fifo;
     char name[50];
-}tty_t;
+} tty_t;
 
-tty_t* default_tty_alloc();
+tty_t *default_tty_alloc();
 void free_tty(tty_t *tty);
 void tty_init(void);
-

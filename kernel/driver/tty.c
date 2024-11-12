@@ -28,7 +28,7 @@ static void tty_putchar(tty_t *tty_d,int c){
     }
 }
 
-static void tty_move_cursor(tty_t *tty_d, int x, int y){
+static void tty_move_cursor(int x, int y){
     vga_move_cursor(x,y);
 }
 
@@ -63,7 +63,7 @@ void tty_init(void){
 
     default_tty.fifo = kmalloc(sizeof(struct FIFO8));
     char* buf = kmalloc(512);
-    fifo8_init(default_tty.fifo, 512, (unsigned char *)buf);
+    fifo8_init(default_tty.fifo, 512, (unsigned int *)buf);
 
     tty_status = TTY_VGA_OUTPUT;
 }

@@ -4,29 +4,50 @@ add_rules("mode.debug", "mode.release")
 add_requires("zig", "nasm")
 
 set_arch("i386")
+set_languages("c23")
 set_optimize("fastest")
 set_warnings("all", "extra")
 set_policy("run.autobuild", true)
+set_policy("check.auto_ignore_flags", false)
+
+add_cflags("-target x86-freestanding")
+add_arflags("-target x86-freestanding")
+add_ldflags("-target x86-freestanding")
+add_cflags("-mno-80387", "-mno-mmx", "-mno-sse", "-mno-sse2")
+
+target("libc")
+    set_kind("static")
+    set_toolchains("@zig")
+    set_default(false)
+
+    add_includedirs("apps/include")
+    add_headerfiles("apps/libc/*.h")
+    add_files("apps/libc/**.c")
+
+target("shell")
+    set_kind("binary")
+    add_deps("libc")
+    set_toolchains("@zig")
+    set_default(false)
+
+    add_includedirs("apps/include")
+    add_files("apps/shell/**.c")
 
 target("kernel")
     set_kind("binary")
-    set_languages("c23")
+    add_deps("shell")
     set_toolchains("@zig", "nasm")
     set_default(false)
 
-    add_linkdirs("lib")
-    add_includedirs("src/include")
+    add_linkdirs("libs")
+    add_includedirs("kernel/include")
 
     add_links("os_terminal")
     add_links("elf_parse")
-    add_files("src/**/*.asm", "src/**/*.c")
+    add_files("kernel/**/*.asm", "kernel/**/*.c")
 
-    add_asflags("-f", "elf32", {force = true})
-    add_cflags("-target x86-freestanding", {force = true})
-    add_ldflags("-target x86-freestanding", {force = true})
-
-    add_ldflags("-T", "linker.ld", {force = true})
-    add_cflags("-mno-80387", "-mno-mmx", "-mno-sse", "-mno-sse2", {force = true})
+    add_asflags("-f", "elf32")
+    add_ldflags("-T", "linker.ld")
 
 target("iso")
     set_kind("phony")
@@ -37,13 +58,13 @@ target("iso")
         import("core.project.project")
         local iso_dir = "$(buildir)/iso_dir"
 
-        if os.exists(iso_dir) then
-            os.rmdir(iso_dir)
-        end
+        if os.exists(iso_dir) then os.rmdir(iso_dir) end
+        os.cp("assets", iso_dir)
 
-        os.cp("iso", iso_dir)
-        local target = project.target("kernel")
-        os.cp(target:targetfile(), iso_dir .. "/cpkrnl.elf")
+        local kernel = project.target("kernel")
+        os.cp(kernel:targetfile(), iso_dir .. "/cpkrnl.elf")
+        local shell = project.target("shell")
+        os.cp(kernel:targetfile(), iso_dir .. "/apps/shell.elf")
 
         local iso_file = "$(buildir)/mdros.iso"
         local xorriso_flags = "-b limine/limine-bios-cd.bin -no-emul-boot -boot-info-table"

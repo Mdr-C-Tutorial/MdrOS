@@ -1,7 +1,5 @@
 #include "syscall.h"
 
-extern int main(int argc,char** argv);
-
 static inline int cmd_parse(char *cmd_str, char **argv, char token) {
     int arg_idx = 0;
     while (arg_idx < 50) {
@@ -24,12 +22,14 @@ static inline int cmd_parse(char *cmd_str, char **argv, char token) {
     return argc;
 }
 
-void _start(){
-    char* cmdline = (char*) __syscall(SYSCALL_GET_ARG);
+extern int main(int argc, char **argv);
+
+void _start() {
+    char *cmdline = (char *)__syscall0(SYSCALL_GET_ARG);
     int argc = 0;
-    char * argv[50];
+    char *argv[50];
     argc = cmd_parse(cmdline, argv, ' ');
-    int code = main(argc,argv);
-    __syscall(SYSCALL_EXIT,code);
+    int code = main(argc, argv);
+    __syscall(SYSCALL_EXIT, code);
     while (1);
 }
