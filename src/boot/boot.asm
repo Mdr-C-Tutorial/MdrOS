@@ -16,13 +16,13 @@ times 52 db 0 ; 显式初始化 52 个字节为零
 
 section .text
 global _start
-extern kernel_main ; 内核主函数 main.c
+extern kernel_head ; 内核预处理函数 src/core/mboot/kernel_head.c
 
 _start:
     mov esp,stack_top
     push esp
     push ebx
-    call kernel_main
+    call kernel_head
 L1:
     hlt
     jmp L1

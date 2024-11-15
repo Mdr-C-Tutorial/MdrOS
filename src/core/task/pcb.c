@@ -94,6 +94,13 @@ int create_user_process(const char* path,const char* cmdline,char* name,uint8_t 
     for (uint32_t i = (uint32_t)new_task->program_break; i < (uint32_t)new_task->program_break_end; i += PAGE_SIZE) {
         alloc_frame(get_page(i,1,new_task->pgd_dir),0,1);
     }
+    new_task->program_break += PAGE_SIZE;
+
+    //映射用户堆初始大小
+    new_task->program_break_end += USER_AREA_SIZE;
+    for (uint32_t i = (uint32_t)new_task->program_break; i < (uint32_t)new_task->program_break_end; i += PAGE_SIZE) {
+        alloc_frame(get_page(i,1,new_task->pgd_dir),0,1);
+    }
 
     // 映射用户栈区
     for (uint32_t i = USER_STACK_TOP - STACK_SIZE; i < USER_STACK_TOP; i+= PAGE_SIZE) {

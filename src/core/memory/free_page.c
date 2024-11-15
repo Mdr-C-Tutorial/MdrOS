@@ -36,3 +36,9 @@ void setup_free_page(){
     uint8_t *buf = kmalloc(sizeof(uint32_t) * MAX_FREE_QUEUE);
     fifo8_init(fifo8,sizeof(uint32_t) * MAX_FREE_QUEUE,buf);
 }
+
+uint32_t kh_usage_memory_byte = 0;
+
+uint32_t get_kernel_memory_usage(){
+    return kh_usage_memory_byte;
+}

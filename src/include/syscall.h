@@ -9,6 +9,9 @@
 #define SYSCALL_FREE 5 // 用户堆释放系统调用
 #define SYSCALL_EXIT 6 // 终止该进程
 #define SYSCALL_GET_ARG 7 // 获取程序实参
+#define SYSCALL_POSIX_OPEN 8
+#define SYSCALL_POSIX_CLOSE 9
+#define SYSCALL_POSIX_READ 10
 
 #define __syscall0(id)                                                                             \
   ({                                                                                               \

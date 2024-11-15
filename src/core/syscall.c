@@ -6,6 +6,7 @@
 #include "klog.h"
 #include "keyboard.h"
 #include "krlibc.h"
+#include "user_malloc.h"
 
 static uint32_t syscall_putc(uint32_t ebx,uint32_t ecx,uint32_t edx,uint32_t esi,uint32_t edi){
     get_current_proc()->tty->putchar(get_current_proc()->tty,(int)ebx);
@@ -23,10 +24,11 @@ static uint32_t syscall_getch(uint32_t ebx,uint32_t ecx,uint32_t edx,uint32_t es
 }
 
 static uint32_t syscall_alloc_page(uint32_t ebx,uint32_t ecx,uint32_t edx,uint32_t esi,uint32_t edi){
-    return (uint32_t) NULL;
+    return (uint32_t) user_malloc(ebx);
 }
 
 static uint32_t syscall_free(uint32_t ebx,uint32_t ecx,uint32_t edx,uint32_t esi,uint32_t edi){
+    user_free((void*)ebx);
     return 0;
 }
 
@@ -44,9 +46,31 @@ static uint32_t syscall_exit(uint32_t ebx,uint32_t ecx,uint32_t edx,uint32_t esi
 
 static uint32_t syscall_get_arg(uint32_t ebx,uint32_t ecx,uint32_t edx,uint32_t esi,uint32_t edi){
     pcb_t *pcb = get_current_proc();
-    strcpy(pcb->program_break,pcb->cmdline);
-    pcb->user_cmdline = pcb->program_break;
+    strcpy((char *) USER_AREA_START, pcb->cmdline);
+    pcb->user_cmdline = (char*)USER_AREA_START;
     return (uint32_t)pcb->user_cmdline;
+}
+
+static uint32_t syscall_posix_open(uint32_t ebx,uint32_t ecx,uint32_t edx,uint32_t esi,uint32_t edi) {
+    void *r = vfs_open((const char*)ebx);
+    return (uint32_t) (r == NULL ? -1 : r);
+}
+
+static uint32_t syscall_posix_close(uint32_t ebx,uint32_t ecx,uint32_t edx,uint32_t esi,uint32_t edi) {
+    return (uint32_t ) vfs_close((void*)ebx);
+}
+
+static uint32_t syscall_posix_read(uint32_t ebx,uint32_t ecx,uint32_t edx,uint32_t esi,uint32_t edi) {
+    vfs_node_t file = (vfs_node_t) ebx;
+    void* buf = (void*) ecx;
+    size_t count = (size_t)edx;
+    if(count == 0) return 0;
+    io_sti();
+    if(vfs_read(file,buf,0,count) == -1){
+        return -1;
+    }
+    io_cli();
+    return file->size < count ? file->size : count;
 }
 
 syscall_t syscall_handlers[MAX_SYSCALLS] = {
@@ -57,6 +81,9 @@ syscall_t syscall_handlers[MAX_SYSCALLS] = {
         [SYSCALL_FREE] = syscall_free,
         [SYSCALL_EXIT] = syscall_exit,
         [SYSCALL_GET_ARG] = syscall_get_arg,
+        [SYSCALL_POSIX_OPEN] = syscall_posix_open,
+        [SYSCALL_POSIX_CLOSE] = syscall_posix_close,
+        [SYSCALL_POSIX_READ] = syscall_posix_read,
 };
 
 size_t syscall() { //由 asmfunc.c/asm_syscall_handler调用

@@ -94,6 +94,75 @@ static char *number(char *str, long num, int base, int size, int precision,
     return str;
 }
 
+static const double rounders[10 + 1] = {
+        0.5,				// 0
+        0.05,				// 1
+        0.005,				// 2
+        0.0005,				// 3
+        0.00005,			// 4
+        0.000005,			// 5
+        0.0000005,			// 6
+        0.00000005,			// 7
+        0.000000005,		// 8
+        0.0000000005,		// 9
+        0.00000000005		// 10
+};
+
+char *ftoa(double f, char *buf, int precision) {
+    char *ptr = buf;
+    char *p = ptr;
+    char *p1;
+    char c;
+    long intPart;
+
+    if (precision > 10)
+        precision = 10;
+    if (f < 0) {
+        f = -f;
+        *ptr++ = '-';
+    }
+    if (precision < 0) {
+        if (f < 1.0) precision = 6;
+        else if (f < 10.0) precision = 5;
+        else if (f < 100.0) precision = 4;
+        else if (f < 1000.0) precision = 3;
+        else if (f < 10000.0) precision = 2;
+        else if (f < 100000.0) precision = 1;
+        else precision = 0;
+    }
+    if (precision)
+        f += rounders[precision];
+    intPart = f;
+    f -= intPart;
+    if (!intPart)
+        *ptr++ = '0';
+    else {
+        p = ptr;
+        while (intPart) {
+            *p++ = '0' + intPart % 10;
+            intPart /= 10;
+        }
+        p1 = p;
+        while (p > ptr) {
+            c = *--p;
+            *p = *ptr;
+            *ptr++ = c;
+        }
+        ptr = p1;
+    }
+    if (precision) {
+        *ptr++ = '.';
+        while (precision--) {
+            f *= 10.0;
+            c = f;
+            *ptr++ = '0' + c;
+            f -= c;
+        }
+    }
+    *ptr = 0;
+    return ptr;
+}
+
 int vsprintf(char *buf, const char *fmt, va_list args) {
     int len;
     unsigned long num;
@@ -243,6 +312,9 @@ int vsprintf(char *buf, const char *fmt, va_list args) {
             case 'i':
                 flags |= SIGN;
             case 'u':
+                break;
+            case 'f':
+                str = ftoa(va_arg(args, double), str, precision);
                 break;
 
             default:

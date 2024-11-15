@@ -14,7 +14,6 @@ static void tty_print(tty_t *tty_d,const char* msg){
     if (tty_status == TTY_VGA_OUTPUT){
         for (size_t i = 0; i < strlen(msg); i++) vga_putchar(msg[i]);
     } else if (tty_status == TTY_OST_OUTPUT) {
-        logk(msg);
         terminal_advance_state(msg);
     }
 }

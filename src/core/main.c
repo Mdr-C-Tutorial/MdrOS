@@ -20,6 +20,7 @@
 #include "krlibc.h"
 #include "syscall.h"
 #include "shell.h"
+#include "cpuid.h"
 
 extern void* program_break_end;
 
@@ -56,6 +57,7 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     printk("KernelArea: 0x00000000 - 0x%08x | GraphicsBuffer: 0x%08x \n",
            program_break_end,
            multiboot->framebuffer_addr);
+    init_cpuid();
     klogf(true, "Memory manager initialize.\n");
     acpi_install();  //ACPI初始化
     init_timer(1); //RTC 时钟中断

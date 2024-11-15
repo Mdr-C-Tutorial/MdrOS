@@ -256,6 +256,10 @@ uint8_t *AcpiGetRSDPtr() {
     uint32_t *rsdt;
     uint32_t ebda;
 
+    for (uint32_t i = 0xfeef000; i < 0xfff0000 + PAGE_SIZE; i+= PAGE_SIZE) {
+        alloc_frame_line(get_page(i,1,get_current_directory()),i,1,0);
+    }
+
     for (addr = (uint32_t *) 0x000E0000; addr < (uint32_t *) 0x00100000; addr += 0x10 / sizeof(addr)) {
         rsdt = AcpiCheckRSDPtr(addr);
         if (rsdt) {
@@ -267,6 +271,7 @@ uint8_t *AcpiGetRSDPtr() {
     ebda = *(uint16_t * )
             0x40E;
     ebda = ebda * 0x10 & 0xfffff;
+
     for (addr = (uint32_t *) ebda; addr < (uint32_t * )(ebda + 1024); addr += 0x10 / sizeof(addr)) {
         rsdt = AcpiCheckRSDPtr(addr);
         if (rsdt) {
@@ -359,7 +364,7 @@ void acpi_install() {
     acpi_enable_flag = !acpi_enable();
     hpet_initialize();
     AcpiPowerInit();
-    klogf(b & acpi_enable_flag, "Load acpi driver. NanoTime: %d\n",nanoTime());
+    klogf(b & acpi_enable_flag, "Load acpi driver. Rsdp: %08x NanoTime: %d\n",rsdp_address,nanoTime());
 }
 
 uint32_t nanoTime() {

@@ -11,6 +11,17 @@ pcb_t *current_pcb = NULL;
 pcb_t *running_proc_head = NULL;
 bool can_sche = false; //调度标志位
 
+int get_all_task(){
+    int num = 1;
+    pcb_t *pcb = running_proc_head;
+    do{
+        pcb = pcb->next;
+        if(pcb == NULL) break;
+        num++;
+    } while (1);
+    return num;
+}
+
 void enable_scheduler(){
     can_sche = true;
 }

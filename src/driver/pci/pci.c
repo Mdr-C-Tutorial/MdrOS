@@ -146,6 +146,10 @@ struct
 pci_device_t *pci_device[PCI_DEVICE_MAX];
 uint32_t device_number = 0;
 
+uint32_t get_pci_num(){
+    return PCI_NUM;
+}
+
 uint8_t pci_get_drive_irq(uint8_t bus, uint8_t slot, uint8_t func) {
     return (uint8_t)
             read_pci(bus, slot, func, 0x3c);
@@ -283,7 +287,7 @@ void load_pci_device(uint32_t BUS,uint32_t Equipment,uint32_t F){
     }
     pci_device[device_number++] = device;
 
-    printk("Found PCI device: %03d:%02d:%02d [0x%04X:0x%04X] <%08x> %s\n",
+    logkf("Found PCI device: %03d:%02d:%02d [0x%04X:0x%04X] <%08x> %s\n",
           device->bus,
           device->slot,
           device->func,

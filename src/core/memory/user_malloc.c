@@ -1,47 +1,13 @@
-#include "kmalloc.h"
+#include "user_malloc.h"
 #include "krlibc.h"
-#include "page.h"
+#include "scheduler.h"
 #include "klog.h"
 
-extern page_directory_t *kernel_directory; //page.c
-
-void *program_break = (void*)0x3e0000;
-void *program_break_end;
-
-#define getpagesize() PAGE_SIZE
-
-static void *sbrk(int incr) { //内核堆扩容措施
-    if (program_break == 0) {
-        return (void *) -1;
-    }
-
-    if (program_break + incr >= program_break_end) {
-        ral:
-        if(program_break_end >= (void*)0x01bf8f7d) goto alloc_error; // 奇怪的界限, 不设置内核会卡死
-        if ((uint32_t) program_break_end < USER_AREA_START) {
-            uint32_t ai = (uint32_t) program_break_end;
-            for (; ai < (uint32_t) program_break_end + PAGE_SIZE * 10;) {
-                alloc_frame(get_page(ai, 1, kernel_directory), 1, 0);
-                ai += PAGE_SIZE;
-            }
-            program_break_end = (void *) ai;
-
-            if (program_break + incr >= program_break_end) {
-                goto ral;
-            }
-        } else {
-            alloc_error:
-            klogf(false, "OUT_OF_MEMORY_ERROR: Cannot alloc kernel heap.\n");
-            printk("KernelHeapEnd: %08x\n", program_break_end);
-            while (1) __asm__("hlt");
-            return (void *) -1;
-        }
-    }
-
-    void *prev_break = program_break;
-    program_break += incr;
-    return prev_break;
-}
+#define u_char unsigned char
+#define u_long unsigned long
+#define getpagesize() 4096
+#define caddr_t size_t
+#define bcopy(a, b, c) memcpy(b,a,c)
 
 union overhead {
     union overhead *ov_next;    /* when free */
@@ -76,9 +42,36 @@ static void morecore(int bucket);
 
 static int findbucket(union overhead *freep, int srchlen);
 
-extern uint32_t kh_usage_memory_byte; //free_page.c
+static void *sbrk(int incr){
+    pcb_t *pcb = get_current_proc();
+    if (pcb->program_break + incr >= pcb->program_break_end) {
+        ral:
+        if(pcb->program_break_end >= (void*)0x01bf8f7d) goto alloc_error; // 奇怪的界限, 不设置内核会卡死
+        if ((uint32_t) pcb->program_break_end < USER_AREA_START) {
+            uint32_t ai = (uint32_t) pcb->program_break_end;
+            for (; ai < (uint32_t) pcb->program_break_end + PAGE_SIZE * 10;) {
+                alloc_frame(get_page(ai, 1, pcb->pgd_dir), 1, 0);
+                ai += PAGE_SIZE;
+            }
+            pcb->program_break_end = (void *) ai;
 
-void *kmalloc(size_t nbytes) {
+            if (pcb->program_break + incr >= pcb->program_break_end) {
+                goto ral;
+            }
+        } else {
+            alloc_error:
+            klogf(false, "OUT_OF_MEMORY_ERROR: Cannot alloc user heap.\n");
+            printk("UserHeapEnd: %08x\n", pcb->program_break_end);
+            return (void *) -1;
+        }
+    }
+
+    void *prev_break = pcb->program_break;
+    pcb->program_break += incr;
+    return prev_break;
+}
+
+void *user_malloc(size_t nbytes) {
     register union overhead *op;
     register int bucket;
     register long n;
@@ -128,12 +121,11 @@ void *kmalloc(size_t nbytes) {
     nextf[bucket] = op->ov_next;
     op->ov_magic = MAGIC;
     op->ov_index = bucket;
-    kh_usage_memory_byte += bucket;
     return ((char *) (op + 1));
 }
 
-void *kcalloc(size_t nelem, size_t elsize) {
-    void *ptr = kmalloc(nelem * elsize);
+void *user_calloc(size_t nelem, size_t elsize) {
+    void *ptr = user_malloc(nelem * elsize);
     memset(ptr, 0, nelem * elsize);
     return ptr;
 }
@@ -164,7 +156,7 @@ static void morecore(int bucket) {
     }
 }
 
-void kfree(void *cp) {
+void user_free(void *cp) {
     register long size;
     register union overhead *op;
 
@@ -188,13 +180,12 @@ void kfree(void *cp) {
 #ifdef MSTATS
     nmalloc[size]--;
 #endif
-    kh_usage_memory_byte -= size;
 }
 
 
 /* EDB: added size lookup */
 
-size_t kmalloc_usable_size(void *cp) {
+size_t user_usable_size(void *cp) {
     register union overhead *op;
 
     if (cp == NULL)
@@ -209,7 +200,7 @@ size_t kmalloc_usable_size(void *cp) {
 
 static int realloc_srchlen = 4;    /* 4 should be plenty, -1 =>'s whole list */
 
-void *krealloc(void *cp, size_t nbytes) {
+void *user_realloc(void *cp, size_t nbytes) {
     register u_long onb;
     register long i;
     union overhead *op;
@@ -217,9 +208,9 @@ void *krealloc(void *cp, size_t nbytes) {
     int was_alloced = 0;
 
     if (cp == NULL)
-        return (kmalloc(nbytes));
+        return (user_malloc(nbytes));
     if (nbytes == 0) {
-        kfree(cp);
+        user_free(cp);
         return NULL;
     }
     op = (union overhead *) ((caddr_t) cp - sizeof(union overhead));
@@ -248,9 +239,9 @@ void *krealloc(void *cp, size_t nbytes) {
         if (nbytes <= onb && nbytes > i) {
             return (cp);
         } else
-            kfree(cp);
+            user_free(cp);
     }
-    if ((res = kmalloc(nbytes)) == NULL)
+    if ((res = user_malloc(nbytes)) == NULL)
         return (NULL);
     if (cp != res)        /* common optimization if "compacting" */
         bcopy(cp, res, (nbytes < onb) ? nbytes : onb);

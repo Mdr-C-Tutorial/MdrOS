@@ -271,7 +271,9 @@ int iso9660_mkfile(void *parent, const char* name, vfs_node_t node) {
 
 int iso9660_readfile(file_t file, void *addr, size_t offset, size_t size) {
     if (file->type == file_dir) return -1;
+
     l9660_file  *fp = file->handle;
+    size = fp->length < size ? fp->length : size;
     l9660_status st;
     st = l9660_seek(fp, SEEK_SET, offset);
     if (st != L9660_OK) return -1;

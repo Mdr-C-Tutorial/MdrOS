@@ -38,6 +38,7 @@ typedef struct base_address_register {
     int type;
 } base_address_register;
 
+uint32_t get_pci_num();
 uint8_t pci_get_drive_irq(uint8_t bus, uint8_t slot, uint8_t func);
 uint32_t pci_get_port_base(uint8_t bus, uint8_t slot, uint8_t func);
 uint32_t read_bar_n(uint8_t bus, uint8_t device, uint8_t function, uint8_t bar_n);

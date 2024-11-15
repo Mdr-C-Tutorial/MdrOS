@@ -5,6 +5,10 @@
 #include "cmos.h"
 #include "vfs.h"
 #include "pcb.h"
+#include "cpuid.h"
+#include "pci.h"
+#include "video.h"
+#include "scheduler.h"
 
 static inline int isprint_syshell(int c) {
     return (c > 0x1F && c < 0x7F);
@@ -118,6 +122,7 @@ static void read(int argc,char** argv) {
             printk("%c",buf[i]);
         }
         printk("\n");
+        return;
     }
     read_error:
     printk("Cannot read file.\n");
@@ -125,6 +130,46 @@ static void read(int argc,char** argv) {
 
 static void shutdown_os(){
     shutdown();
+}
+
+static inline void foreach(list_t list){
+    list_foreach(list,node){
+        vfs_node_t c = (vfs_node_t)node->data;
+        if(c->type == file_dir) foreach(c->child);
+        else{
+            char* buf = kmalloc(c->size);
+            vfs_read(c,buf,0,c->size);
+            printk("%s > %s\n",c->name);
+        }
+    }
+}
+
+extern uint32_t phy_mem_size;
+
+static void sys_info(){
+    cpu_t *cpu = get_cpuid();
+
+    uint32_t mb = get_kernel_memory_usage() / 1024;
+
+    printk("        -*&@@@&*-        \n");
+    printk("      =&@@@@@@@@@:\033[36m-----\033[39m          -----------------\n");
+    printk("    .&@@@@@@@@@@:\033[36m+@@@@@:\033[39m         OSName:       MdrOS\n");
+    printk("  .@@@@@@@@@@@:\033[36m+@@@@@@@:\033[39m         Process:      %d\n",get_all_task());
+    printk("  &@@@@@@@@@@:\033[36m+@@@@@@@@:\033[39m         CPU:          %s\n",cpu->model_name);
+    printk(" =@@@@@@@@+-.\033[36m+@@@@@@@@@:\033[39m         MemoryAll:    %dMB\n",(int)(phy_mem_size));
+    printk("-@@@@@@*     \033[36m&@@@@@@@=:\033[39m@-        PCI Device:   %d\n",get_pci_num());
+    printk("*@@@@@&      \033[36m&@@@@@@=:\033[39m@@*        Resolution:   %d x %d\n",get_vbe_width(),get_vbe_height());
+    printk("&@@@@@+      \033[36m&@@@@@=:\033[39m@@@&        Time:         %s\n",get_date_time());
+    printk("@@@@@@:      \033[36m#&&&&=:\033[39m@@@@@        Console:      os_terminal\n");
+    printk("&@@@@@+           +@@@@@&        Kernel:       %s\n",KERNEL_NAME);
+    printk("*@@@@@@           @@@@@@*        Memory Usage: %dKB\n",mb);
+    printk("-@@@@@@*         #@@@@@@:\n");
+    printk(" &@@@@@@*.     .#@@@@@@& \n");
+    printk(" =@@@@@@@@*---*@@@@@@@@- \n");
+    printk("  .@@@@@@@@@@@@@@@@@@&.  \n");
+    printk("    .#@@@@@@@@@@@@@#.    \n");
+    printk("      =&@@@@@@@@@&-      \n");
+    printk("        -*&@@@&+:        \n");
 }
 
 static void print_help(){
@@ -135,6 +180,7 @@ static void print_help(){
     printk("ls        [path]         List all file or directory.\n");
     printk("read      <path>         Read a text file.\n");
     printk("shutdown                 Shutdown os.\n");
+    printk("sysinfo                  Get os system information.\n");
 }
 
 void setup_shell(){
@@ -145,11 +191,13 @@ void setup_shell(){
            "\n"
            " System information as of %s \n"
            "\n"
-           "  Users logged in:       Kernel\n"
+           "  Processes:             %d\n"
+           "  User login in:         Kernel\n"
            "\n"
-           "Copyright 2024 XIAOYI12 (Build by GCC i686-elf-tools)\n"
+           "Copyright 2024 XIAOYI12 (Build by xmake @zig & nasm)\n"
             ,KERNEL_NAME
-            ,get_date_time());
+            ,get_date_time(),
+            get_all_task());
     char com[MAX_COMMAND_LEN];
     char *argv[MAX_ARG_NR];
     int argc = -1;
@@ -177,6 +225,8 @@ void setup_shell(){
             read(argc,argv);
         else if(!strcmp("shutdown",argv[0]))
             shutdown_os();
+        else if(!strcmp("sysinfo",argv[0]))
+            sys_info();
         else{
             int pid;
             if((pid = create_user_process(argv[0],com_copy,"User",TASK_APPLICATION_LEVEL)) == -1)
