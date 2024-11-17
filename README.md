@@ -7,6 +7,8 @@ A simple OS for x86 architecture.
 fork by `CoolPotOS`
 
 * New Memory Manager
+* New TTY Device Driver
+* New multitask
 
 Project struct document [Project docs](docs/README.md)
 

@@ -55,7 +55,7 @@ static void Write(int drive, uint8_t *buffer, uint32_t number, uint32_t lba) {
 void ide_init(){
     pci_device_t *ide_ctrl = pci_find_class(0x010100);
     if(ide_ctrl == NULL){
-        klogf(false,"Cannot find ide device\n");
+        klogf(false,"Cannot find ide controller\n");
         return;
     } else klogf(true,"Find IDE Controller\n");
 

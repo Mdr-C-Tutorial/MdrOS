@@ -28,6 +28,12 @@ static void tty_putchar(tty_t *tty_d,int c){
     }
 }
 
+static void tty_clear(tty_t *tty_d){
+    if (tty_status == TTY_OST_OUTPUT) {
+        printk("\033[2J");
+    }
+}
+
 static void tty_move_cursor(int x, int y){
     vga_move_cursor(x,y);
 }
@@ -37,6 +43,7 @@ tty_t* default_tty_alloc(){
     tty->print = tty_print;
     tty->move_cursor = tty_move_cursor;
     tty->putchar = tty_putchar;
+    tty->clear = tty_clear;
     strcpy(tty->name,"ost/default");
 
     tty->fifo = kmalloc(sizeof(struct FIFO8));
@@ -55,7 +62,7 @@ void tty_init(void){
     default_tty.color = 0x1;
     default_tty.back_color = 0x0;
     default_tty.video_ram = (uint32_t *)0xB8000;
-
+    default_tty.clear = tty_clear;
     default_tty.print = tty_print;
     default_tty.move_cursor = tty_move_cursor;
     default_tty.putchar = tty_putchar;

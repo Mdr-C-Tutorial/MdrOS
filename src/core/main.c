@@ -10,17 +10,19 @@
 #include "free_page.h"
 #include "pci.h"
 #include "ide.h"
+#include "ahci.h"
 #include "vdisk.h"
 #include "vfs.h"
 #include "devfs.h"
 #include "os_terminal.h"
 #include "pcb.h"
+#include "cpuid.h"
 #include "keyboard.h"
+#include "mouse.h"
 #include "scheduler.h"
 #include "krlibc.h"
 #include "syscall.h"
 #include "shell.h"
-#include "cpuid.h"
 
 extern void* program_break_end;
 
@@ -66,13 +68,18 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     init_pci(); //pci设备列表加载, 所有PCI设备相关驱动初始化需在此函数后方调用
 
     ide_init();
+    ahci_init();
 
     devfs_regist();
     io_cli(); //ide驱动会打开中断以加载硬盘设备, 需重新关闭中断以继续初始化其余OS功能
     iso9660_regist();
     init_pcb();
+
     keyboard_init();
+    mouse_init();
+
     setup_syscall();
+
     create_kernel_thread((void*)setup_shell, NULL, "Shell");
     klogf(true,"Enable kernel shell service.\n");
 

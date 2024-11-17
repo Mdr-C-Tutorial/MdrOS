@@ -9,6 +9,7 @@
 #include "pci.h"
 #include "video.h"
 #include "scheduler.h"
+#include "svos.h"
 
 static inline int isprint_syshell(int c) {
     return (c > 0x1F && c < 0x7F);
@@ -163,7 +164,7 @@ static void sys_info(){
     printk("@@@@@@:      \033[36m#&&&&=:\033[39m@@@@@        Console:      os_terminal\n");
     printk("&@@@@@+           +@@@@@&        Kernel:       %s\n",KERNEL_NAME);
     printk("*@@@@@@           @@@@@@*        Memory Usage: %dKB\n",mb);
-    printk("-@@@@@@*         #@@@@@@:\n");
+    printk("-@@@@@@*         #@@@@@@:        32-bit operating system, x86-based processor\n");
     printk(" &@@@@@@*.     .#@@@@@@& \n");
     printk(" =@@@@@@@@*---*@@@@@@@@- \n");
     printk("  .@@@@@@@@@@@@@@@@@@&.  \n");
@@ -181,6 +182,7 @@ static void print_help(){
     printk("read      <path>         Read a text file.\n");
     printk("shutdown                 Shutdown os.\n");
     printk("sysinfo                  Get os system information.\n");
+    printk("svos                     Launch saturn virtual os.\n");
 }
 
 void setup_shell(){
@@ -227,6 +229,8 @@ void setup_shell(){
             shutdown_os();
         else if(!strcmp("sysinfo",argv[0]))
             sys_info();
+        else if(!strcmp("svos",argv[0]))
+            svos_setup();
         else{
             int pid;
             if((pid = create_user_process(argv[0],com_copy,"User",TASK_APPLICATION_LEVEL)) == -1)
