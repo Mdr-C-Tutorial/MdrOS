@@ -167,11 +167,6 @@ uint32_t pci_get_port_base(uint8_t bus, uint8_t slot, uint8_t func) {
     return io_port;
 }
 
-uint32_t read_bar_n(uint8_t bus, uint8_t device, uint8_t function, uint8_t bar_n) {
-    uint32_t bar_offset = 0x10 + 4 * bar_n;
-    return read_pci(bus, device, function, bar_offset);
-}
-
 void write_pci(uint8_t bus, uint8_t device, uint8_t function, uint8_t registeroffset, uint32_t value) {
     uint32_t id = 1 << 31 | ((bus & 0xff) << 16) | ((device & 0x1f) << 11) |
                   ((function & 0x07) << 8) | (registeroffset & 0xfc);
@@ -197,6 +192,11 @@ uint32_t read_pci(uint8_t bus, uint8_t device, uint8_t function, uint8_t registe
     io_out32(PCI_COMMAND_PORT, id);
     uint32_t result = io_in32(PCI_DATA_PORT);
     return result >> (8 * (registeroffset % 4));
+}
+
+uint32_t read_bar_n(pci_device_t *device, uint8_t bar_n) {
+    uint32_t bar_offset = 0x10 + 4 * bar_n;
+    return read_pci(device->bus, device->slot, device->func, bar_offset);
 }
 
 base_address_register get_base_address_register(uint8_t bus, uint8_t device, uint8_t function, uint8_t bar) {
@@ -259,7 +259,7 @@ pci_device_t *pci_find_class(uint32_t class_code){
 }
 
 base_address_register find_bar(pci_device_t *device,uint8_t barNum){
-    base_address_register bar =get_base_address_register(device->bus, device->slot, device->func, barNum);
+    base_address_register bar = get_base_address_register(device->bus, device->slot, device->func, barNum);
     return bar;
 }
 

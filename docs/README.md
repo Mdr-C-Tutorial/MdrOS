@@ -5,15 +5,12 @@
 
 <hr>
 
-* `build.py` CPOS废弃的一键构建脚本
 * `xmake.lua` xmake 构建脚本
 * `linker.ld` 内核源码的链接脚本
 
 ## src
 
 `CP_Kernel` 内核源码文件夹
-
-* 详细说明 [src about](KrnlSrc.md)
 
 ## iso
 
@@ -22,8 +19,6 @@
 
 ### limine
 Limine引导器文件夹
-
-`grub.cfg` GRUB引导配置文件
 
 ### sys
 

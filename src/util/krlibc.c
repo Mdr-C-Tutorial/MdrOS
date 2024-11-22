@@ -163,6 +163,129 @@ char *ftoa(double f, char *buf, int precision) {
     return ptr;
 }
 
+float ceilf(float x) {
+    float fract = x - (int)x; // 获取小数部分
+    if (fract > 0) {
+        return (int)x + 1; // 如果有小数部分，向上取整
+    } else {
+        return (int)x; // 如果没有小数部分，直接返回整数部分
+    }
+}
+
+float floorf(float x) {
+    float fract = x - (int)x; // 获取小数部分
+    if (fract < 0) {
+        return (int)x - 1; // 如果是负数且有小数部分，向下取整
+    } else {
+        return (int)x; // 如果是正数或没有小数部分，直接返回整数部分
+    }
+}
+
+float roundf(float number) {
+    if (number < 0.0f) {
+        return ceilf(number - 0.5f);
+    } else {
+        return floorf(number + 0.5f);
+    }
+}
+
+double fabs(double x) {
+    if (x < 0) {
+        return -x;
+    } else {
+        return x;
+    }
+}
+
+double floor(double x) {
+    double fract = x - (int)x;
+    if (fract < 0) {
+        return (int)x - 1;
+    } else {
+        return (int)x;
+    }
+}
+
+double ceil(double x) {
+    double fract = x - (int)x; // 获取小数部分
+    if (fract > 0) {
+        return (int)x + 1; // 如果有小数部分，向上取整
+    } else {
+        return (int)x; // 如果没有小数部分，直接返回整数部分
+    }
+}
+
+double fmod(double x, double y) {
+    if (y == 0) {
+        return __builtin_nanf("");
+    }
+    double intPart = x / y;
+    double remainder = x - intPart * y;
+    if (remainder < 0) {
+        remainder += y;
+    } else if (remainder > y) {
+        remainder -= y;
+    }
+    return remainder;
+}
+
+double cos(double x) {
+    double sum = 0.0;
+    double term = 1.0;
+    int n = 0;
+
+    for (n = 0; term > 1e-15; n++) {
+        term = term * (-1) * (2 * n) * (2 * n - 1) / ((2 * n) * (2 * n - 1));
+        sum += term;
+    }
+
+    return sum;
+}
+
+double acos(double x) {
+    double x0 = x;
+    double x1;
+    double tolerance = 1e-15;
+    double max_iterations = 1000;
+    int iterations = 0;
+
+    while (iterations < max_iterations) {
+        x1 = x0 - (-1 / sqrt(1 - x0 * x0)) / (1 / cos(x0));
+        if (fabs(x1 - x0) < tolerance) {
+            break;
+        }
+        x0 = x1;
+        iterations++;
+    }
+
+    return x1;
+}
+
+double sqrt(double number) {
+    if (number < 0) {
+        return __builtin_nanf("");
+    }
+
+    double x = number;
+    double epsilon = 1e-15;
+    double diff;
+
+    do {
+        x = (x + number / x) / 2;
+        diff = fabs(x - number / x);
+    } while (diff > epsilon);
+
+    return x;
+}
+
+double pow(double x, int y) {
+    double result = 1.0;
+    for (int i = 0; i < y; i++) {
+        result *= x;
+    }
+    return result;
+}
+
 int vsprintf(char *buf, const char *fmt, va_list args) {
     int len;
     unsigned long num;

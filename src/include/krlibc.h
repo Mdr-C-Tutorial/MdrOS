@@ -25,6 +25,18 @@
     while (cond) {}                                                                                \
   }))
 
+#ifndef NDEBUG
+#define assert(condition) \
+    do { \
+        if (!(condition)) { \
+            fprintf(stderr, "Assertion failed: %s\n", #condition); \
+            abort(); \
+        } \
+    } while (0)
+#else
+#define assert(condition) (void)0
+#endif
+
 #include "ctypes.h"
 #include <stdarg.h>
 
@@ -33,6 +45,18 @@ typedef struct _xstr {
     size_t hash;
     char   data[];
 } *xstr;
+
+float roundf(float number);
+float ceilf(float x);
+float floorf(float x);
+double fabs(double x);
+double ceil(double x);
+double floor(double x);
+double fmod(double x, double y);
+double cos(double x);
+double acos(double x);
+double sqrt(double number);
+double pow(double x, int y);
 
 int vsprintf(char *buf, const char *fmt, va_list args);
 int sprintf(char *buf, const char *fmt, ...);

@@ -9,7 +9,7 @@
 #include "pci.h"
 #include "video.h"
 #include "scheduler.h"
-#include "svos.h"
+#include "desktop.h"
 
 static inline int isprint_syshell(int c) {
     return (c > 0x1F && c < 0x7F);
@@ -182,7 +182,7 @@ static void print_help(){
     printk("read      <path>         Read a text file.\n");
     printk("shutdown                 Shutdown os.\n");
     printk("sysinfo                  Get os system information.\n");
-    printk("svos                     Launch saturn virtual os.\n");
+    printk("desktop                  Launch kernel desktop service.\n");
 }
 
 void setup_shell(){
@@ -229,8 +229,8 @@ void setup_shell(){
             shutdown_os();
         else if(!strcmp("sysinfo",argv[0]))
             sys_info();
-        else if(!strcmp("svos",argv[0]))
-            svos_setup();
+        else if(!strcmp("desktop",argv[0]))
+            desktop_setup();
         else{
             int pid;
             if((pid = create_user_process(argv[0],com_copy,"User",TASK_APPLICATION_LEVEL)) == -1)

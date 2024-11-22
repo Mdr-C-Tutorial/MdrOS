@@ -31,3 +31,9 @@ static inline void terminal_setup() {
     terminal_init(get_vbe_width(), get_vbe_height(), get_vbe_screen(), 10.0,
                   kmalloc, kfree, logk);
 }
+
+static inline void terminal_exit(){
+    extern uint32_t tty_status;
+    tty_status = TTY_LOG_OUTPUT;
+    terminal_destroy();
+}

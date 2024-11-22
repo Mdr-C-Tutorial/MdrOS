@@ -43,7 +43,7 @@ target("iso")
         os.cp("assets", iso_dir)
 
         local kernel = project.target("kernel")
-        os.cp(kernel:targetfile(), iso_dir .. "/cpkrnl.elf")
+        os.cp(kernel:targetfile(), iso_dir .. "/sys/cpkrnl.elf")
 
         local iso_file = "$(buildir)/mdros.iso"
         local xorriso_flags = "-b limine/limine-bios-cd.bin -no-emul-boot -boot-info-table"
@@ -53,5 +53,6 @@ target("iso")
 
     on_run(function (target)
         local flags = "-serial stdio -m 4096"
-        os.exec("qemu-system-i386 -cdrom $(buildir)/mdros.iso %s", flags)
+        local scsi_flags = "-drive file=./disk.qcow2,if=none,id=disk0 -device ahci,id=ahci -device ide-hd,bus=ahci.0,drive=disk0"
+        os.exec("qemu-system-i386 -cdrom $(buildir)/mdros.iso %s %s", flags,scsi_flags)
     end)

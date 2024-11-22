@@ -8,6 +8,7 @@ void show_memory_map(multiboot_t *mboot) {
     uint32_t mmap_addr = mboot->mmap_addr;
     uint32_t mmap_length = mboot->mmap_length;
 
+    /*
     mmap_entry_t *mmap = (mmap_entry_t *) mmap_addr;
     for (mmap = (mmap_entry_t *) mmap_addr; (uint32_t) mmap < mmap_addr + mmap_length; mmap++) {
         if(mmap->type == MULTIBOOT_MEMORY_ACPI_RECLAIMABLE)
@@ -23,7 +24,8 @@ void show_memory_map(multiboot_t *mboot) {
         else if(mmap->type == MULTIBOOT_MEMORY_RESERVED)
             logkf("mmap: %08x RESERVED\n",(uint32_t) mmap->base_addr_low);
         else logkf("mmap: %08x UNKNOWN\n",(uint32_t) mmap->base_addr_low);
-    }
+
+    }*/
 }
 
 void init_mmap(multiboot_t *multiboot){

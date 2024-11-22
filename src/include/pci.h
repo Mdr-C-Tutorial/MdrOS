@@ -41,7 +41,7 @@ typedef struct base_address_register {
 uint32_t get_pci_num();
 uint8_t pci_get_drive_irq(uint8_t bus, uint8_t slot, uint8_t func);
 uint32_t pci_get_port_base(uint8_t bus, uint8_t slot, uint8_t func);
-uint32_t read_bar_n(uint8_t bus, uint8_t device, uint8_t function, uint8_t bar_n);
+uint32_t read_bar_n(pci_device_t *device, uint8_t bar_n);
 void write_pci(uint8_t bus, uint8_t device, uint8_t function, uint8_t registeroffset, uint32_t value);
 uint32_t pci_read_command_status(uint8_t bus, uint8_t slot, uint8_t func);
 void pci_write_command_status(uint8_t bus, uint8_t slot, uint8_t func, uint32_t value);

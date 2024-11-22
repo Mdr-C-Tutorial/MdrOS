@@ -3,9 +3,8 @@
 build/
 CMakeLists.txt
 
-# Build.py cache
-/target
-mdros.iso
+# Disk cache
+*.qcow2
 
 # IDE Config
 .idea/

@@ -60,6 +60,7 @@ void ide_init(){
     } else klogf(true,"Find IDE Controller\n");
 
     ide_initialize(0x1F0, 0x3F6, 0x170, 0x376, 0x000);
+    klogf(true,"IDE Device load done!\n");
 }
 
 void ide_wait_irq() {
