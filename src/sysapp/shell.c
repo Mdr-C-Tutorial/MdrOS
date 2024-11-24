@@ -149,7 +149,19 @@ extern uint32_t phy_mem_size;
 static void sys_info(){
     cpu_t *cpu = get_cpuid();
 
-    uint32_t mb = get_kernel_memory_usage() / 1024;
+    extern void* program_break;
+    extern void* program_break_end;
+    uint32_t bytes = get_kernel_memory_usage() + (uint32_t)program_break + (uint32_t)program_break_end;
+
+    extern pcb_t *running_proc_head;
+    pcb_t *pcb = running_proc_head;
+    while(pcb != NULL){
+        pcb = pcb->next;
+        if(pcb->task_level != TASK_KERNEL_LEVEL){
+            bytes += (uint32_t)pcb->program_break + (uint32_t)pcb->program_break_end;
+        }
+    }
+    int memory = (bytes > 10485760) ? bytes/1048576 : bytes/1024;
 
     printk("        -*&@@@&*-        \n");
     printk("      =&@@@@@@@@@:\033[36m-----\033[39m          -----------------\n");
@@ -161,7 +173,7 @@ static void sys_info(){
     printk("&@@@@@+      \033[36m&@@@@@=:\033[39m@@@&        Time:         %s\n",get_date_time());
     printk("@@@@@@:      \033[36m#&&&&=:\033[39m@@@@@        Console:      os_terminal\n");
     printk("&@@@@@+           +@@@@@&        Kernel:       %s\n",KERNEL_NAME);
-    printk("*@@@@@@           @@@@@@*        Memory Usage: %dKB / %dMB\n",mb,(int)(phy_mem_size));
+    printk("*@@@@@@           @@@@@@*        Memory Usage: %d%s / %dMB\n",memory,bytes > 10485760 ? "MB" : "KB",(int)(phy_mem_size));
     printk("-@@@@@@*         #@@@@@@:        32-bit operating system, x86-based processor\n");
     printk(" &@@@@@@*.     .#@@@@@@& \n");
     printk(" =@@@@@@@@*---*@@@@@@@@- \n");
