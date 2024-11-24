@@ -144,6 +144,25 @@ static inline void foreach(list_t list){
     }
 }
 
+// 实现ps命令
+static void ps(){
+    extern pcb_t *running_proc_head;
+    // 找出最长进程名
+    pcb_t *longest_name = running_proc_head;
+    int longest_name_len = 0;
+    while(longest_name != NULL){
+        if(strlen(longest_name->name) > longest_name_len)
+            longest_name_len = strlen(longest_name->name);
+        longest_name = longest_name->next;
+    }
+    pcb_t *pcb = running_proc_head;
+    printk("PID  %-*s       RAM  Level   Priority  Time\n",longest_name_len,"NAME");
+    while(pcb != NULL){
+        printk("%-5d%-*s%10d  %-8s%-10d%-d\n",pcb->pid,longest_name_len,pcb->name,pcb->program_break_end - pcb->program_break,pcb->task_level == TASK_KERNEL_LEVEL ? "Kernel" : pcb->task_level == TASK_SYSTEM_SERVICE_LEVEL ? "System" : "User",pcb->task_level,pcb->cpu_clock);
+        pcb = pcb->next;
+    }
+}   
+
 extern uint32_t phy_mem_size;
 
 static void sys_info(){
@@ -151,14 +170,14 @@ static void sys_info(){
 
     extern void* program_break;
     extern void* program_break_end;
-    uint32_t bytes = get_kernel_memory_usage() + (uint32_t)program_break + (uint32_t)program_break_end;
+    uint32_t bytes = get_kernel_memory_usage() + (uint32_t)program_break_end - (uint32_t)program_break;
 
     extern pcb_t *running_proc_head;
     pcb_t *pcb = running_proc_head;
     while(pcb != NULL){
         pcb = pcb->next;
         if(pcb->task_level != TASK_KERNEL_LEVEL){
-            bytes += (uint32_t)pcb->program_break + (uint32_t)pcb->program_break_end;
+            bytes += (uint32_t)pcb->program_break_end - (uint32_t)pcb->program_break;
         }
     }
     int memory = (bytes > 10485760) ? bytes/1048576 : bytes/1024;
@@ -234,6 +253,8 @@ void setup_shell(){
             shutdown_os();
         else if(!strcmp("sysinfo",argv[0]))
             sys_info();
+        else if(!strcmp("ps",argv[0]))
+            ps();
         else{
             int pid;
             if((pid = create_user_process(argv[0],com_copy,"User",TASK_APPLICATION_LEVEL)) == -1)
