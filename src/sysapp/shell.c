@@ -118,7 +118,7 @@ static void read(int argc,char** argv) {
         if(vfs_read(file,buf,0,file->size) == -1){
             goto read_error;
         }
-        for (int i = 0; i < file->size; i++) {
+        for (size_t i = 0; i < file->size; i++) {
             printk("%c",buf[i]);
         }
         printk("\n");
@@ -149,7 +149,7 @@ static void ps(){
     extern pcb_t *running_proc_head;
     // 找出最长进程名
     pcb_t *longest_name = running_proc_head;
-    int longest_name_len = 0;
+    size_t longest_name_len = 0;
     while(longest_name != NULL){
         if(strlen(longest_name->name) > longest_name_len)
             longest_name_len = strlen(longest_name->name);
