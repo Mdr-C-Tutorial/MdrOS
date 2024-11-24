@@ -1,6 +1,6 @@
 #pragma once
 
-#define KERNEL_NAME "CP_Kernel-i386-0.4.1"
+#define KERNEL_NAME "CP_Kernel-i386-0.4.2"
 
 #define KHEAP_INITIAL_SIZE 0xf00000
 #define STACK_SIZE 32768
@@ -14,6 +14,30 @@
 
 #define PADDING_DOWN(size, to) ((size_t)(size) / (size_t)(to) * (size_t)(to))
 #define PADDING_UP(size, to)   PADDING_DOWN((size_t)(size) + (size_t)(to) - (size_t)1, to)
+
+#define mem_geti(addr)   ({ *(volatile ssize_t *)(addr); })
+#define mem_geti8(addr)  ({ *(volatile int8_t *)(addr); })
+#define mem_geti16(addr) ({ *(volatile int16_t *)(addr); })
+#define mem_geti32(addr) ({ *(volatile int32_t *)(addr); })
+#define mem_geti64(addr) ({ *(volatile int64_t *)(addr); })
+
+#define mem_getu(addr)   ({ *(volatile size_t *)(addr); })
+#define mem_getu8(addr)  ({ *(volatile uint8_t *)(addr); })
+#define mem_getu16(addr) ({ *(volatile uint16_t *)(addr); })
+#define mem_getu32(addr) ({ *(volatile uint32_t *)(addr); })
+#define mem_getu64(addr) ({ *(volatile uint64_t *)(addr); })
+
+#define mem_get(addr)   mem_getu(addr)
+#define mem_get8(addr)  mem_getu8(addr)
+#define mem_get16(addr) mem_getu16(addr)
+#define mem_get32(addr) mem_getu32(addr)
+#define mem_get64(addr) mem_getu64(addr)
+
+#define mem_set(addr, val)   ({ *(volatile size_t *)(addr) = (size_t)(val); })
+#define mem_set8(addr, val)  ({ *(volatile uint8_t *)(addr) = (uint8_t)(val); })
+#define mem_set16(addr, val) ({ *(volatile uint16_t *)(addr) = (uint16_t)(val); })
+#define mem_set32(addr, val) ({ *(volatile uint32_t *)(addr) = (uint32_t)(val); })
+#define mem_set64(addr, val) ({ *(volatile uint64_t *)(addr) = (uint64_t)(val); })
 
 #define swap32(x)                                                              \
   ((((x) & 0xff000000) >> 24) | (((x) & 0x00ff0000) >> 8) |                    \
@@ -34,11 +58,17 @@
         } \
     } while (0)
 #else
-#define assert(condition) (void)0
+#define assert(condition,...) (void)0
 #endif
 
 #include "ctypes.h"
 #include <stdarg.h>
+
+static inline void bzero(void *_s, size_t _n) {
+    for (size_t i = 0; i < _n; i++) {
+        ((uint8_t *)_s)[i] = 0;
+    }
+}
 
 typedef struct _xstr {
     size_t len;
@@ -67,6 +97,7 @@ void *memset(void *s, int c, size_t n);
 void *memmove(void *dest, const void *src, size_t num);
 size_t strnlen(const char *s, size_t maxlen);
 size_t strlen(const char *str);
+char* strchr(const char* str,int c);
 char *strstr(char *str1, char *str2);
 char *strncpy(char *dest, const char *src, unsigned long long count);
 char *strdup(const char *str);

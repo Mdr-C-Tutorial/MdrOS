@@ -70,7 +70,9 @@ static void ahci_vdisk_read(int drive, uint8_t *buffer, uint32_t number, uint32_
     ahci_read(&(hba_mem->ports[drive_mapping[drive]]), lba, 0, number, (uint16_t *)buffer);
 }
 
-static void ahci_vdisk_write(int drive, uint8_t *buffer, uint32_t number, uint32_t lba) {}
+static void ahci_vdisk_write(int drive, uint8_t *buffer, uint32_t number, uint32_t lba) {
+    ahci_write(&(hba_mem->ports[drive_mapping[drive]]),lba,0,number,(uint16_t *)buffer);
+}
 
 void ahci_search_ports(HBA_MEM *abar) {
     // Search disk in implemented ports

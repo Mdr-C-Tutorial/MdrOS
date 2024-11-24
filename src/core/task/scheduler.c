@@ -43,8 +43,15 @@ void scheduler_process(registers_t *reg){
 }
 
 void default_scheduler(registers_t *reg,pcb_t* next){ //CP_Kernel 默认的进程调度器
+
+    if(current_pcb->sche_time > 1){
+        current_pcb->sche_time--;
+        return;
+    }
+
     if (current_pcb != next) {
         if(next == NULL) next = running_proc_head;
+        current_pcb->sche_time = 1;
         pcb_t *prev = current_pcb;
         current_pcb = next;
         switch_page_directory(current_pcb->pgd_dir);

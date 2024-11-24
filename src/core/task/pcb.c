@@ -87,6 +87,7 @@ int create_user_process(const char* path,const char* cmdline,char* name,uint8_t 
     new_task->cpu_clock = 0;
     new_task->exe_file = exefile;
     new_task->kernel_stack = new_task;
+    new_task->sche_time = 1;
     new_task->program_break = new_task->program_break_end = (void*)USER_AREA_START;
 
     // 映射形参数据区
@@ -158,6 +159,7 @@ int create_kernel_thread(int (*_start)(void* arg),void *args,char* name){ //创�
     new_task->cpu_clock = 0;
     new_task->tty = default_tty_alloc();
     new_task->cpu_clock = 0;
+    new_task->sche_time = 1;
     new_task->user_stack = new_task->kernel_stack;
 
     new_task->kernel_stack = new_task;
@@ -237,6 +239,7 @@ void init_pcb(){
     current_pcb->next = current_pcb;
     current_pcb->kernel_stack = current_pcb;
     current_pcb->tty = &default_tty;
+    current_pcb->sche_time = 1;
     current_pcb->pgd_dir = kernel_directory;
     current_pcb->context.esp = (uint32_t )current_pcb->kernel_stack;
 

@@ -736,6 +736,16 @@ char *strcat(char *dest, const char *src) {
     while ((*temp++ = *src++) != '\0');
 }
 
+char* strchr(const char* str,int c){
+    while (*str != '\0'){
+        if(*str == c){
+            return (char*) str;
+        }
+        str++;
+    }
+    return NULL;
+}
+
 int isspace(int c) {
     return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' ||
             c == '\v');

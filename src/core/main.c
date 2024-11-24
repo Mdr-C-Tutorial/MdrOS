@@ -27,6 +27,7 @@
 extern void* program_break_end;
 
 extern void iso9660_regist(); //iso9660.c
+extern void fatfs_regist(); //fat.c
 
 _Noreturn void shutdown(){
     printk("Shutdown %s...\n",KERNEL_NAME);
@@ -73,6 +74,7 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     devfs_regist();
     io_cli(); //ide驱动会打开中断以加载硬盘设备, 需重新关闭中断以继续初始化其余OS功能
     iso9660_regist();
+    fatfs_regist();
     init_pcb();
 
     keyboard_init();
@@ -83,8 +85,20 @@ _Noreturn void kernel_main(multiboot_t *multiboot, uint32_t kernel_stack) {
     create_kernel_thread((void*)setup_shell, NULL, "Shell");
     klogf(true,"Enable kernel shell service.\n");
 
-    vfs_mkdir("/a");
-    vfs_mount("/dev/ide0", vfs_open("/a"));
+    // 挂载最后一个块设备(通常为引导设备)
+    vfs_node_t dev = vfs_open("/dev");
+    vfs_node_t c = NULL;
+    list_foreach(dev->child, i) {
+        c = (vfs_node_t) i->data;
+    }
+    if(c == NULL) {
+        klogf(false,"Cannot mount a drive device.\n");
+        goto jmp;
+    }
+    char buf[20];
+    sprintf(buf,"/dev/%s",c->name);
+    vfs_mount(buf, vfs_open("/"));
+    jmp:
 
     klogf(true,"Kernel load done!\n");
     enable_scheduler();

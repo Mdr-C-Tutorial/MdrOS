@@ -55,7 +55,9 @@ typedef struct task_pcb{
     struct context context;       // 上下文信息
     tty_t *tty;                   // TTY设备
     bool fpu_flag;				  // 是否使用 FPU
+    int now_tid;
     uint32_t cpu_clock;           // CPU运行时间片
+    uint32_t sche_time;           // 进程剩余的可运行时间片
     vfs_node_t exe_file;          // 可执行文件
     uint8_t *data;                // 可执行文件内核数据缓冲区
     struct task_pcb *next;     // 链表指针

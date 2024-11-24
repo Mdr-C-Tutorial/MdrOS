@@ -27,6 +27,9 @@ idt_flush: ; void idt_flush(uint32_t);
     lidt [eax]
     ret
 
+thread_switch_to: ;void thread_switch_to(struct thread_context *prev, struct thread_context *next);
+
+
 switch_to: ;void switch_to(struct context *prev, struct context *next);
         mov eax, [esp+4]
 

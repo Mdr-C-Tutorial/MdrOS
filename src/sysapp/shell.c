@@ -9,7 +9,6 @@
 #include "pci.h"
 #include "video.h"
 #include "scheduler.h"
-#include "desktop.h"
 
 static inline int isprint_syshell(int c) {
     return (c > 0x1F && c < 0x7F);
@@ -157,13 +156,12 @@ static void sys_info(){
     printk("    .&@@@@@@@@@@:\033[36m+@@@@@:\033[39m         OSName:       MdrOS\n");
     printk("  .@@@@@@@@@@@:\033[36m+@@@@@@@:\033[39m         Process:      %d\n",get_all_task());
     printk("  &@@@@@@@@@@:\033[36m+@@@@@@@@:\033[39m         CPU:          %s\n",cpu->model_name);
-    printk(" =@@@@@@@@+-.\033[36m+@@@@@@@@@:\033[39m         MemoryAll:    %dMB\n",(int)(phy_mem_size));
     printk("-@@@@@@*     \033[36m&@@@@@@@=:\033[39m@-        PCI Device:   %d\n",get_pci_num());
     printk("*@@@@@&      \033[36m&@@@@@@=:\033[39m@@*        Resolution:   %d x %d\n",get_vbe_width(),get_vbe_height());
     printk("&@@@@@+      \033[36m&@@@@@=:\033[39m@@@&        Time:         %s\n",get_date_time());
     printk("@@@@@@:      \033[36m#&&&&=:\033[39m@@@@@        Console:      os_terminal\n");
     printk("&@@@@@+           +@@@@@&        Kernel:       %s\n",KERNEL_NAME);
-    printk("*@@@@@@           @@@@@@*        Memory Usage: %dKB\n",mb);
+    printk("*@@@@@@           @@@@@@*        Memory Usage: %dKB / %dMB\n",mb,(int)(phy_mem_size));
     printk("-@@@@@@*         #@@@@@@:        32-bit operating system, x86-based processor\n");
     printk(" &@@@@@@*.     .#@@@@@@& \n");
     printk(" =@@@@@@@@*---*@@@@@@@@- \n");
@@ -182,20 +180,15 @@ static void print_help(){
     printk("read      <path>         Read a text file.\n");
     printk("shutdown                 Shutdown os.\n");
     printk("sysinfo                  Get os system information.\n");
-    printk("desktop                  Launch kernel desktop service.\n");
 }
 
 void setup_shell(){
     printk("Welcome to MdrOS (%s)\n"
-           "\n"
            " * SourceCode:     https://github.com/Mdr-C-Tutorial/MdrOS\n"
            " * Website:        https://github.com/plos-clan\n"
-           "\n"
            " System information as of %s \n"
-           "\n"
            "  Processes:             %d\n"
            "  User login in:         Kernel\n"
-           "\n"
            "Copyright 2024 XIAOYI12 (Build by xmake @zig & nasm)\n"
             ,KERNEL_NAME
             ,get_date_time(),
@@ -229,8 +222,6 @@ void setup_shell(){
             shutdown_os();
         else if(!strcmp("sysinfo",argv[0]))
             sys_info();
-        else if(!strcmp("desktop",argv[0]))
-            desktop_setup();
         else{
             int pid;
             if((pid = create_user_process(argv[0],com_copy,"User",TASK_APPLICATION_LEVEL)) == -1)
