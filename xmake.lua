@@ -18,6 +18,7 @@ add_cflags("-mno-80387", "-mno-mmx", "-mno-sse", "-mno-sse2")
 target("kernel")
     set_kind("binary")
     set_toolchains("@zig", "nasm")
+    set_toolset("as", "nasm")
     set_default(false)
 
     add_linkdirs("libs")
